@@ -49,7 +49,6 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
     credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer owner_session',
       ...(options.headers || {})
     },
     ...options
@@ -64,7 +63,6 @@ function apiFetchWithBody(method: string, body?: unknown): RequestInit {
     credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer owner_session',
     },
   };
 
