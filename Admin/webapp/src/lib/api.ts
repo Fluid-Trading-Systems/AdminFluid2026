@@ -44,11 +44,15 @@ export function logout(): void {
 
 // Global API fetch helper - ALL requests must go through this
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
+
+  const token = localStorage.getItem("fts_token");
+
   return fetch(`${API_BASE}${path}`, {
     mode: 'cors',
     credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {})
     },
     ...options
@@ -57,12 +61,16 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
 
 // Standard fetch config for JSON requests with body
 function apiFetchWithBody(method: string, body?: unknown): RequestInit {
+
+  const token = localStorage.getItem("fts_token");
+
   const config: RequestInit = {
     method,
     mode: 'cors',
     credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   };
 
@@ -72,7 +80,6 @@ function apiFetchWithBody(method: string, body?: unknown): RequestInit {
 
   return config;
 }
-
 // Authentication API
 export async function login(credentials: LoginRequest): Promise<LoginResponse> {
   const res = await apiFetch("/auth/login", apiFetchWithBody('POST', credentials));
