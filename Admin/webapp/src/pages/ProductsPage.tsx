@@ -407,6 +407,9 @@ export function ProductsPage() {
           gallery_images: galleryUrls.length > 0 ? galleryUrls : (imageUrl ? [imageUrl] : []),
           plan_type: formData.plan_type.toLowerCase() || null,
           price_tier: null,
+           rating: formData.rating,   // ⭐ ADD THIS
+  faqs: formData.faqs,       // ❓ ADD THIS
+
           enabled: 1
         })
       });
