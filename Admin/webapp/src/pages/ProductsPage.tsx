@@ -125,6 +125,13 @@ interface ProductFormData {
   long_description: string;
   image_url: string;
   modules: string[];
+
+  rating: number;  // ✅ ADD HERE
+
+  faqs: {          // ✅ ADD HERE
+    question: string;
+    answer: string;
+  }[];
 }
 
 const initialFormData: ProductFormData = {
@@ -137,6 +144,9 @@ const initialFormData: ProductFormData = {
   long_description: '',
   image_url: '',
   modules: [],
+
+  rating: 0,      // ✅ ADD
+  faqs: []        // ✅ ADD
 };
  
 
