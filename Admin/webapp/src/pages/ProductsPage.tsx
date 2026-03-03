@@ -871,6 +871,89 @@ export function ProductsPage() {
                     />
                   </div>
 
+                  {/* Product Rating */}
+<div className="space-y-2">
+  <Label className="text-slate-300">Product Rating</Label>
+
+  <div className="flex gap-1">
+    {[1,2,3,4,5].map((star) => (
+      <button
+        key={star}
+        type="button"
+        onClick={() => setFormData({ ...formData, rating: star })}
+        className="text-2xl"
+      >
+        <span className={star <= formData.rating ? "text-yellow-400" : "text-slate-600"}>
+          ★
+        </span>
+      </button>
+    ))}
+  </div>
+
+  <p className="text-xs text-slate-500">
+    Selected: {formData.rating} / 5
+  </p>
+</div>
+
+                  {/* FAQ Section */}
+<div className="space-y-3">
+  <Label className="text-slate-300">Product FAQs (Max 5)</Label>
+
+  {formData.faqs.map((faq, index) => (
+    <div key={index} className="bg-slate-800/50 p-3 rounded-lg space-y-2">
+      <Input
+        placeholder="Question"
+        value={faq.question}
+        onChange={(e) => {
+          const updated = [...formData.faqs];
+          updated[index].question = e.target.value;
+          setFormData({ ...formData, faqs: updated });
+        }}
+        className="bg-slate-950 border-slate-700 text-white"
+      />
+
+      <Textarea
+        placeholder="Answer"
+        value={faq.answer}
+        onChange={(e) => {
+          const updated = [...formData.faqs];
+          updated[index].answer = e.target.value;
+          setFormData({ ...formData, faqs: updated });
+        }}
+        className="bg-slate-950 border-slate-700 text-white"
+      />
+
+      <Button
+        type="button"
+        variant="destructive"
+        size="sm"
+        onClick={() => {
+          const updated = formData.faqs.filter((_, i) => i !== index);
+          setFormData({ ...formData, faqs: updated });
+        }}
+      >
+        Remove FAQ
+      </Button>
+    </div>
+  ))}
+
+  {formData.faqs.length < 5 && (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() =>
+        setFormData({
+          ...formData,
+          faqs: [...formData.faqs, { question: '', answer: '' }]
+        })
+      }
+      className="border-slate-600 text-slate-400"
+    >
+      Add FAQ
+    </Button>
+  )}
+</div>
+
                   {/* Display Gallery Upload */}
                   <div className="space-y-2">
                     <Label className="text-slate-300">Display Gallery</Label>
