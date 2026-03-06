@@ -92,7 +92,7 @@ const PLATFORMS = [
 const PLAN_TYPES = ['Lifetime', 'Monthly'] as const;
 
 const LIFETIME_PRICES = [600, 550];
-const MONTHLY_PRICES = [55, 45, 35];
+const MONTHLY_PRICES = [0.5, 35, 45, 55];
 
 
 // ============================================
