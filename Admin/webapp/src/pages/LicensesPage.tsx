@@ -113,11 +113,12 @@ export function LicensesPage() {
     }
   }, [location.state, isLoading]);
 
-  const filteredLicenses = licenses.filter(
-    (license) =>
-      (license?.license_key || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      String(license?.product_id || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+ const filteredLicenses = licenses.filter(
+  (license) =>
+    (license?.license_key || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (license?.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    String(license?.product_id || '').toLowerCase().includes(searchQuery.toLowerCase())
+);
 
   const handleOpenCreate = () => {
     setFormData(initialFormData);
@@ -290,7 +291,7 @@ export function LicensesPage() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
               <Input
-                placeholder="Search by license key or product..."
+                placeholder="Search by license key, email or product..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-slate-950 border-slate-700 text-white placeholder:text-slate-600"
@@ -320,10 +321,11 @@ export function LicensesPage() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-800 hover:bg-transparent">
-                    <TableHead className="text-slate-400">License Key</TableHead>
-                    <TableHead className="text-slate-400">Product</TableHead>
-                    <TableHead className="text-slate-400">Type</TableHead>
+  <TableRow className="border-slate-800 hover:bg-transparent">
+    <TableHead className="text-slate-400">License Key</TableHead>
+    <TableHead className="text-slate-400">Email</TableHead>
+    <TableHead className="text-slate-400">Product</TableHead>
+    <TableHead className="text-slate-400">Type</TableHead>
                     <TableHead className="text-slate-400">Status</TableHead>
                     <TableHead className="text-slate-400">Created</TableHead>
                     <TableHead className="text-slate-400">Expires</TableHead>
@@ -341,6 +343,12 @@ export function LicensesPage() {
                           </code>
                         </div>
                       </TableCell>
+
+                      <TableCell>
+  <span className="text-slate-300 text-sm">
+    {license?.email || 'N/A'}
+  </span>
+</TableCell>
                       <TableCell>
                         <span className="text-white text-sm">
                           {getProductName(license?.product_id)}
