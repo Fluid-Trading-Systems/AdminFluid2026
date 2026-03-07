@@ -226,7 +226,7 @@ export function LicensesPage() {
   };
 
   const getProductName = (productId: number) => {
-    const product = products.find((p) => p?.id === String(productId));
+    const product = products.find((p) => Number(p?.id) === Number(productId));
     return product?.name || '';
   };
 
