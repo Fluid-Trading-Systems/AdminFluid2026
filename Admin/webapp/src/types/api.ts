@@ -81,12 +81,12 @@ export interface ProductFile {
 
 // Licenses
 export interface License {
-  license_key: string;
-  product_id: number;
-  type: 'monthly' | 'lifetime' | 'subscription';
-  status: 'active' | 'cancelled';
-  created_at: string;
-  expires_at: string | null;
+  id: number
+  license_key: string
+  email: string
+  product_id: number
+  status: string
+  created_at?: string
 }
 
 export interface CreateLicenseRequest {
