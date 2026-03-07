@@ -7,6 +7,8 @@ import { LoginPage } from '@/pages/LoginPage';
 import { DashboardHome } from '@/pages/DashboardHome';
 import { ProductsPage } from '@/pages/ProductsPage';
 import { LicensesPage } from '@/pages/LicensesPage';
+import { CustomersPage } from '@/pages/CustomersPage';
+import { OrdersPage } from '@/pages/OrdersPage';
 import { ApiKeysPage } from '@/pages/ApiKeysPage';
 import { ActivityPage } from '@/pages/ActivityPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage';
@@ -31,6 +33,8 @@ function App() {
             <Route index element={<DashboardHome />} />
             <Route path="products" element={<ProductsPage />} />
             <Route path="licenses" element={<LicensesPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="orders" element={<OrdersPage />} />            
             <Route path="api-keys" element={<ApiKeysPage />} />
             <Route path="activity" element={<ActivityPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
