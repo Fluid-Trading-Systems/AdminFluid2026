@@ -23,12 +23,18 @@ import {
   TrendingUp,
   Activity,
   PieChart,
+  Users,
+  CreditCard
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Products', href: '/dashboard/products', icon: Package },
   { name: 'Licenses', href: '/dashboard/licenses', icon: FileText },
+
+  { name: 'Customers', href: '/dashboard/customers', icon: Users },
+  { name: 'Orders', href: '/dashboard/orders', icon: CreditCard },
+
   { name: 'API Keys', href: '/dashboard/api-keys', icon: Key },
   { name: 'Activity', href: '/dashboard/activity', icon: Activity },
   { name: 'Analytics', href: '/dashboard/analytics', icon: PieChart },
