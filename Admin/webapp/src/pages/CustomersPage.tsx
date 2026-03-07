@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, User } from "lucide-react";
 import { toast } from "sonner";
+import type { CreateLicenseRequest } from "@/types/api";
 
 interface Customer {
   email: string;
@@ -31,11 +32,13 @@ export default function CustomersPage() {
 
   const handleCreateLicense = async (email: string) => {
     try {
-   await createLicense({
+  const request: CreateLicenseRequest = {
   email,
   product_id: "1",
   type: "lifetime",
-});
+};
+
+await createLicense(request);
 
       toast.success("License generated for customer");
     } catch {
