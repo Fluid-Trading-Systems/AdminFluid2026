@@ -34,10 +34,9 @@ export default function CustomersPage() {
     try {
   const request: CreateLicenseRequest = {
   email,
-  product_id: "1",
+  productId: "1",
   type: "lifetime",
 };
-
 await createLicense(request);
 
       toast.success("License generated for customer");
