@@ -32,9 +32,9 @@ export default function CustomersPage() {
 
   const handleCreateLicense = async (email: string) => {
     try {
-  const request: CreateLicenseRequest = {
+ const request: CreateLicenseRequest = {
   email,
-  productId: "1",
+  product_id: "1",
   type: "lifetime",
 };
 await createLicense(request);
