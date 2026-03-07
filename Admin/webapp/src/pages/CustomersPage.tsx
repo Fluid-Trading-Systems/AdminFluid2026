@@ -31,10 +31,11 @@ export default function CustomersPage() {
 
   const handleCreateLicense = async (email: string) => {
     try {
-      await createLicense({
-        email,
-        type: "lifetime",
-      });
+   await createLicense({
+  email,
+  product_id: "1",
+  type: "lifetime",
+});
 
       toast.success("License generated for customer");
     } catch {
