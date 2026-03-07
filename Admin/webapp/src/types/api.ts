@@ -15,10 +15,12 @@ export interface LoginResponse {
 
 // Admin Stats - GET /admin/stats
 export interface AdminStats {
-  totalLicenses: number;
-  activeLicenses: number;
-  apiKeys: number;
-  customers: number;
+  totalLicenses: number
+  activeLicenses: number
+  apiKeys: number
+  customers: number
+  orders?: number
+  revenue?: number
 }
 
 // Admin Activity - GET /admin/activity
@@ -89,6 +91,31 @@ export interface License {
   status: 'active' | 'expired' | 'cancelled'
   created_at: string
   expires_at: string | null
+}
+
+// Customers
+export interface Customer {
+  email: string
+  licenses: number
+  created_at: string
+}
+
+export interface CustomerDetails {
+  email: string
+  licenses: License[]
+  created_at: string
+}
+
+// Orders / Payments
+export interface Order {
+  id: string
+  email: string
+  product: string
+  amount: number
+  currency?: string
+  status: 'paid' | 'pending' | 'failed'
+  stripe_session_id?: string
+  created_at: string
 }
 
 export interface CreateLicenseRequest {
