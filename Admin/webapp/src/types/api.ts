@@ -119,10 +119,10 @@ export interface Order {
 }
 
 export interface CreateLicenseRequest {
+  email?: string;
   product_id: string;
   type: 'monthly' | 'lifetime';
 }
-
 // API Keys
 export interface CreateApiKeyRequest {
   product_id: string;
