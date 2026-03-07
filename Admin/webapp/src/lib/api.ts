@@ -326,6 +326,44 @@ export async function createLicense(licenseData: CreateLicenseRequest): Promise<
   return data.license || data;
 }
 
+
+// ========== CUSTOMERS API ==========
+
+// GET /admin/customers
+export async function getCustomers() {
+  try {
+    const res = await apiFetch("/admin/customers", apiFetchWithBody('GET'));
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    return data.customers || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+
+// ========== ORDERS API ==========
+
+// GET /admin/orders
+export async function getOrders() {
+  try {
+    const res = await apiFetch("/admin/orders", apiFetchWithBody('GET'));
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    return data.orders || [];
+  } catch (error) {
+    return [];
+  }
+}
+
 // DELETE /licenses/:licenseKey
 export async function cancelLicense(licenseKey: string): Promise<void> {
   const res = await apiFetch(`/licenses/${licenseKey}`, apiFetchWithBody('DELETE'));
