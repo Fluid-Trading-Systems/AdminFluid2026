@@ -685,24 +685,36 @@ export function ProductsPage() {
                     </select>
                   </div>
 
-                  {/* Platform Icon (Optional) */}
+         {/* Platform Icon (Optional) */}
 <div className="space-y-2">
   <Label className="text-slate-300">
     Platform Icon (Optional)
   </Label>
 
-  <Input
-    placeholder="e.g. /platforms/ctrader.png"
+  <select
     value={formData.platform_icon}
     onChange={(e) =>
       setFormData({ ...formData, platform_icon: e.target.value })
     }
-    className="bg-slate-950 border-slate-700 text-white"
-  />
+    className="w-full bg-slate-950 border border-slate-700 text-white rounded-md px-3 py-2"
+  >
+    <option value="">No Icon</option>
+    <option value="/tradingview.svg">TradingView</option>
+    <option value="/ninjatrader.png">NinjaTrader</option>
+    <option value="/crt.png">cTrader</option>
+    <option value="/MT5.png">MetaTrader 5</option>
+    <option value="/python5.svg">Python</option>
+  </select>
 
-  <p className="text-xs text-slate-500">
-    Leave empty if no icon is required
-  </p>
+  {formData.platform_icon && (
+    <div className="mt-2 flex items-center gap-2">
+      <img
+        src={formData.platform_icon}
+        className="h-6 w-6 object-contain"
+      />
+      <span className="text-xs text-slate-400">Preview</span>
+    </div>
+  )}
 </div>
 
                   {/* Plan Type Selector */}
