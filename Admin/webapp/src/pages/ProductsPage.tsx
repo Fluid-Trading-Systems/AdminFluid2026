@@ -1013,20 +1013,21 @@ export function ProductsPage() {
                       disabled={galleryImages.length >= 6}
                       className="w-full border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50"
                     >
-                      <Image className="h-4 w-4 mr-2" />
-                      Add Gallery Images ({galleryImages.length + selectedGalleryFiles.length}/6)
-                    </Button>
 
-                    {/* Gallery Preview Grid */}
-                    {galleryImages.length > 0 && (
-                      <div className="grid grid-cols-4 gap-2 mt-3">
-                        {galleryImages.map((img, index) => (
-                          <div key={index} className="relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700">
-                            <img
-                              src={img}
-                              alt={`Gallery ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
+                      <Image className="h-4 w-4 mr-2" />
+Add Gallery Images ({galleryImages.length}/6)
+</Button>
+
+{/* Gallery Preview Grid */}
+{galleryImages.length > 0 && (
+  <div className="grid grid-cols-4 gap-2 mt-3">
+    {galleryImages.map((img, index) => (
+      <div key={index} className="relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700">
+        <img
+          src={img}
+          alt={`Gallery ${index + 1}`}
+          className="w-full h-full object-cover"
+        />
                             <Button
                               type="button"
                               variant="destructive"
