@@ -313,7 +313,7 @@ export function ProductsPage() {
     if (files.length === 0) return;
 
     // Check total limit
-    const currentCount = galleryImages.length + selectedGalleryFiles.length;
+    const currentCount = galleryImages.length;
     const remainingSlots = 6 - currentCount;
     
     if (remainingSlots <= 0) {
