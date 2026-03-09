@@ -118,6 +118,7 @@ const ACCEPTED_FILE_TYPES = ['.zip', '.rar', '.pdf', '.txt', '.dll', '.ex5', '.c
 interface ProductFormData {
   name: string;
   platform: string;
+  platform_icon: string;
   plan_type: 'Lifetime' | 'Monthly' | '';
   price: string;
   description: string;
@@ -137,6 +138,7 @@ interface ProductFormData {
 const initialFormData: ProductFormData = {
   name: '',
   platform: '',
+  platform_icon: '',
   plan_type: '',
   price: '',
   description: '',
@@ -400,6 +402,7 @@ export function ProductsPage() {
         body: JSON.stringify({
           name: formData.name,
           platform: formData.platform,
+          platform_icon: formData.platform_icon,
           price: parseFloat(formData.price),
           short_description: formData.short_description,
           long_description: formData.long_description,
@@ -681,6 +684,26 @@ export function ProductsPage() {
                       ))}
                     </select>
                   </div>
+
+                  {/* Platform Icon (Optional) */}
+<div className="space-y-2">
+  <Label className="text-slate-300">
+    Platform Icon (Optional)
+  </Label>
+
+  <Input
+    placeholder="e.g. /platforms/ctrader.png"
+    value={formData.platform_icon}
+    onChange={(e) =>
+      setFormData({ ...formData, platform_icon: e.target.value })
+    }
+    className="bg-slate-950 border-slate-700 text-white"
+  />
+
+  <p className="text-xs text-slate-500">
+    Leave empty if no icon is required
+  </p>
+</div>
 
                   {/* Plan Type Selector */}
                   <div className="space-y-2">
