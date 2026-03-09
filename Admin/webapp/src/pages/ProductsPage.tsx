@@ -1005,36 +1005,39 @@ export function ProductsPage() {
                       multiple
                       className="hidden"
                     />
-                    
                     <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => galleryInputRef.current?.click()}
-                      disabled={galleryImages.length >= 6}
-                      className="w-full border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50"
-                    >
-
-                      <Image className="h-4 w-4 mr-2" />
-Add Gallery Images ({galleryImages.length}/6)
+  type="button"
+  variant="outline"
+  onClick={() => galleryInputRef.current?.click()}
+  disabled={galleryImages.length >= 6}
+  className="w-full border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50"
+>
+  <Image className="h-4 w-4 mr-2" />
+  Add Gallery Images ({galleryImages.length}/6)
 </Button>
 
 {/* Gallery Preview Grid */}
 {galleryImages.length > 0 && (
   <div className="grid grid-cols-4 gap-2 mt-3">
     {galleryImages.map((img, index) => (
-      <div key={index} className="relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700">
+      <div
+        key={index}
+        className="group relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700"
+      >
         <img
           src={img}
           alt={`Gallery ${index + 1}`}
           className="w-full h-full object-cover"
         />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => removeGalleryImage(index)}
-                              className="absolute top-1 right-1 h-6 w-6 p-0"
-                            >
+
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() => removeGalleryImage(index)}
+          className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition"
+        >
+                 
                               <X className="h-3 w-3" />
                             </Button>
                           </div>
