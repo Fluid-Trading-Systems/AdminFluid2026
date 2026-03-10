@@ -265,6 +265,55 @@ const galleryInputRef = useRef<HTMLInputElement>(null);
     }
   };
 
+  // ============================================
+// CARD IMAGE SELECT
+// ============================================
+
+const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    toast.error("Invalid image format");
+    return;
+  }
+
+  if (file.size > MAX_IMAGE_SIZE) {
+    toast.error("Image exceeds 2MB");
+    return;
+  }
+
+  setSelectedImageFile(file);
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    setImagePreview(event.target?.result as string);
+  };
+
+  reader.readAsDataURL(file);
+};
+
+
+// ============================================
+// PRODUCT FILE SELECT
+// ============================================
+
+const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = Array.from(e.target.files || []);
+  if (files.length === 0) return;
+
+  setSelectedFiles(prev => [...prev, ...files]);
+};
+
+
+// ============================================
+// REMOVE SELECTED FILE
+// ============================================
+
+const removeSelectedFile = (index: number) => {
+  setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+};
+
 // ============================================
 // GALLERY MEDIA SELECT (IMAGES + VIDEOS)
 // ============================================
