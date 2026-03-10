@@ -174,17 +174,16 @@ export function ProductsPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const filesInputRef = useRef<HTMLInputElement>(null);
   
- // Gallery media state (images + videos)
-type GalleryMedia = {
-  type: "image" | "video";
-  url: string;
-  file: File;
-};
+  // Gallery images state
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [selectedGalleryFiles, setSelectedGalleryFiles] = useState<File[]>([]);
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
-const [galleryMedia, setGalleryMedia] = useState<GalleryMedia[]>([]);
-
-const [isUploadingGallery, setIsUploadingGallery] = useState(false);
-const galleryInputRef = useRef<HTMLInputElement>(null);
+  // Product video state
+const [productVideo, setProductVideo] = useState<string | null>(null);
+const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
+const videoInputRef = useRef<HTMLInputElement>(null);
   
   // Section expansion state
   const [isCardSectionOpen, setIsCardSectionOpen] = useState(true);
@@ -238,8 +237,10 @@ const galleryInputRef = useRef<HTMLInputElement>(null);
     setImagePreview('');
     setSelectedImageFile(null);
     setSelectedFiles([]);
-    setGalleryMedia([]);
-   
+    setGalleryImages([]);
+    setSelectedGalleryFiles([]);
+    setProductVideo(null);
+setSelectedVideoFile(null);
     setIsCardSectionOpen(true);
     setIsDetailsSectionOpen(false);
     setIsDialogOpen(true);
@@ -265,199 +266,163 @@ const galleryInputRef = useRef<HTMLInputElement>(null);
     }
   };
 
-  // ============================================
-// CARD IMAGE SELECT
-// ============================================
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Validate file type
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      toast.error('Please select a valid image file (PNG, JPG, or WebP)');
+      return;
+    }
+
+    // Validate file size
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error('Image must be less than 2MB');
+      return;
+    }
+
+    setSelectedImageFile(file);
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImagePreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Validate file extensions
+    const validFiles = files.filter(file => {
+
+  // If folder upload (contains path), allow it
+  if ((file as any).webkitRelativePath) {
+    return true;
+  }
+
+  const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+  return ACCEPTED_FILE_TYPES.includes(ext);
+
+});
+
+    if (validFiles.length !== files.length) {
+      toast.error(`Some files were rejected. Accepted types: ${ACCEPTED_FILE_TYPES.join(', ')}`);
+    }
+
+    if (validFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+    }
+  };
+
+  const removeSelectedFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Gallery image handlers
+  const handleGalleryImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Check total limit
+    const currentCount = galleryImages.length;
+    const remainingSlots = 6 - currentCount;
+    
+    if (remainingSlots <= 0) {
+      toast.error('Maximum 6 gallery images allowed');
+      return;
+    }
+
+    const filesToAdd = files.slice(0, remainingSlots);
+
+    // Validate file types
+    const validFiles = filesToAdd.filter(file => {
+      if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+        toast.error(`${file.name} is not a valid image file`);
+        return false;
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error(`${file.name} exceeds 2MB limit`);
+        return false;
+      }
+      return true;
+    });
+
+    setSelectedGalleryFiles(prev => [...prev, ...validFiles]);
+    
+    // Create previews
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setGalleryImages(prev => [...prev, event.target?.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setGalleryImages(prev => prev.filter((_, i) => i !== index));
+    setSelectedGalleryFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Product video handler
+const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0];
   if (!file) return;
 
-  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-    toast.error("Invalid image format");
+  if (!file.type.startsWith("video/")) {
+    toast.error("Please upload a valid video file");
     return;
   }
 
-  if (file.size > MAX_IMAGE_SIZE) {
-    toast.error("Image exceeds 2MB");
+  if (file.size > 20 * 1024 * 1024) {
+    toast.error("Video must be under 20MB");
     return;
   }
 
-  setSelectedImageFile(file);
-
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    setImagePreview(event.target?.result as string);
-  };
-
-  reader.readAsDataURL(file);
+  setSelectedVideoFile(file);
+  setProductVideo(URL.createObjectURL(file));
 };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-// ============================================
-// PRODUCT FILE SELECT
-// ============================================
+    try {
+      let imageUrl = "";
+      let galleryUrls: string[] = [];
 
-const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = Array.from(e.target.files || []);
-  if (files.length === 0) return;
-
-  setSelectedFiles(prev => [...prev, ...files]);
-};
-
-
-// ============================================
-// REMOVE SELECTED FILE
-// ============================================
-
-const removeSelectedFile = (index: number) => {
-  setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-};
-
-// ============================================
-// GALLERY MEDIA SELECT (IMAGES + VIDEOS)
-// ============================================
-
-const handleGalleryMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = Array.from(e.target.files || []);
-  if (files.length === 0) return;
-
-  const remainingSlots = 6 - galleryMedia.length;
-
-  if (remainingSlots <= 0) {
-    toast.error("Maximum 6 gallery items allowed");
-    return;
-  }
-
-  const filesToAdd = files.slice(0, remainingSlots);
-
-  filesToAdd.forEach((file) => {
-
-    // =========================
-    // IMAGE
-    // =========================
-    if (file.type.startsWith("image/")) {
-
-      if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-        toast.error(`${file.name} is not a valid image`);
-        return;
-      }
-
-      if (file.size > MAX_IMAGE_SIZE) {
-        toast.error(`${file.name} exceeds 2MB`);
-        return;
-      }
-
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        setGalleryMedia((prev) => [
-          ...prev,
-          {
-            type: "image",
-            url: event.target?.result as string,
-            file
-          }
-        ]);
-      };
-
-      reader.readAsDataURL(file);
-    }
-
-    // =========================
-    // VIDEO
-    // =========================
-    else if (file.type.startsWith("video/")) {
-
-      const videoUrl = URL.createObjectURL(file);
-
-      setGalleryMedia((prev) => [
-        ...prev,
-        {
-          type: "video",
-          url: videoUrl,
-          file
+      // Upload card image if selected
+      if (selectedImageFile) {
+        setIsUploadingImage(true);
+        try {
+          imageUrl = await uploadProductImage(selectedImageFile);
+        } catch (err) {
+          toast.error('Failed to upload card image');
+          setIsUploadingImage(false);
+          setIsSubmitting(false);
+          return;
         }
-      ]);
-    }
-
-    else {
-      toast.error(`${file.name} is not a supported file`);
-    }
-
-  });
-};
-
-
-// ============================================
-// REMOVE MEDIA FROM GALLERY
-// ============================================
-
-const removeGalleryImage = (index: number) => {
-  setGalleryMedia(prev => prev.filter((_, i) => i !== index));
-};
-
-
-// ============================================
-// PRODUCT SUBMIT
-// ============================================
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-
-  try {
-
-    let imageUrl = "";
-    let galleryUrls: string[] = [];
-
-    // =========================
-    // Upload card image
-    // =========================
-
-    if (selectedImageFile) {
-      setIsUploadingImage(true);
-
-      try {
-        imageUrl = await uploadProductImage(selectedImageFile);
-      } catch (err) {
-        toast.error('Failed to upload card image');
         setIsUploadingImage(false);
-        setIsSubmitting(false);
-        return;
       }
 
-      setIsUploadingImage(false);
-    }
-
-
-    // =========================
-    // Upload gallery media
-    // =========================
-
-    if (galleryMedia.length > 0) {
-
-      setIsUploadingGallery(true);
-
-      try {
-
-      const uploadPromises = galleryMedia.map((item) => {
-  return uploadProductImage(item.file);
-});
-
-        galleryUrls = await Promise.all(uploadPromises);
-
-      } catch (err) {
-
-        toast.error('Failed to upload gallery media. Product not created.');
+      // Upload gallery images if selected - wait for ALL to complete before creating product
+      if (selectedGalleryFiles.length > 0) {
+        setIsUploadingGallery(true);
+        try {
+          // Upload each gallery image individually and wait for all to complete
+          const uploadPromises = selectedGalleryFiles.map(file => uploadProductImage(file));
+          galleryUrls = await Promise.all(uploadPromises);
+        } catch (err) {
+          toast.error('Failed to upload gallery images. Product not created.');
+          setIsUploadingGallery(false);
+          setIsSubmitting(false);
+          return; // Do NOT create product if any gallery upload fails
+        }
         setIsUploadingGallery(false);
-        setIsSubmitting(false);
-        return;
-
       }
-
-      setIsUploadingGallery(false);
-    }
 
       // Create product with uploaded image URLs
       const API_BASE = "https://api.fluidtradingsystems.com";
@@ -509,7 +474,8 @@ const handleSubmit = async (e: React.FormEvent) => {
       setImagePreview('');
       setSelectedImageFile(null);
       setSelectedFiles([]);
-      setGalleryMedia([]);      
+      setGalleryImages([]);
+      setSelectedGalleryFiles([]);
       // Refresh data from API
       await refreshProducts();
     } catch (error) {
@@ -1063,14 +1029,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                   {/* Display Gallery Upload */}
                   <div className="space-y-2">
                     <Label className="text-slate-300">Display Gallery</Label>
-                    <p className="text-xs text-slate-500">PNG, JPG, WebP, MP4, WebM • Max 6 items</p>
+                    <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB each • Max 6 images</p>
                     
                  
   <input
   type="file"
   ref={galleryInputRef}
-  onChange={handleGalleryMediaSelect}
-  accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/webm"
+  onChange={handleGalleryImageSelect}
+  accept="image/png,image/jpeg,image/jpg,image/webp"
   multiple
   className="hidden"
 />
@@ -1078,43 +1044,32 @@ const handleSubmit = async (e: React.FormEvent) => {
   type="button"
   variant="outline"
   onClick={() => galleryInputRef.current?.click()}
-  disabled={galleryMedia.length >= 6}
+  disabled={galleryImages.length >= 6}
   className="w-full border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50"
 >
   <Image className="h-4 w-4 mr-2" />
-  Add Gallery Images ({galleryMedia.length}/6)
+  Add Gallery Images ({galleryImages.length}/6)
 </Button>
 
 {/* Gallery Preview Grid */}
-{galleryMedia.length > 0 && (
+{galleryImages.length > 0 && (
   <div className="grid grid-cols-4 gap-2 mt-3">
-    {galleryMedia.map((media, index) => (
+    {galleryImages.map((img, index) => (
       <div
         key={index}
         className="group relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700"
       >
-        {media.type === "image" ? (
-  <img
-    src={media.url}
-    alt={`Gallery ${index + 1}`}
-    className="w-full h-full object-cover"
-  />
-) : (
-  <video
-    src={media.url}
-    className="w-full h-full object-cover"
-    muted
-    controls
-  />
-)}
+        <img
+          src={img}
+          alt={`Gallery ${index + 1}`}
+          className="w-full h-full object-cover"
+        />
 
         <Button
           type="button"
           variant="destructive"
           size="sm"
-          onClick={() =>
-  setGalleryMedia(prev => prev.filter((_, i) => i !== index))
-}
+          onClick={() => removeGalleryImage(index)}
           className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition"
         >
                  
@@ -1125,6 +1080,54 @@ const handleSubmit = async (e: React.FormEvent) => {
                       </div>
                     )}
                   </div>
+
+{/* Product Video Upload */}
+<div className="space-y-2 pt-4 border-t border-slate-800">
+  <Label className="text-slate-300">Product Video</Label>
+  <p className="text-xs text-slate-500">MP4 or WebM • Max 20MB</p>
+
+  <input
+    type="file"
+    ref={videoInputRef}
+    onChange={handleVideoSelect}
+    accept="video/mp4,video/webm"
+    className="hidden"
+  />
+
+  <Button
+    type="button"
+    variant="outline"
+    onClick={() => videoInputRef.current?.click()}
+    className="w-full border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white"
+  >
+    Upload Product Video
+  </Button>
+
+  {productVideo && (
+    <div className="relative mt-3">
+      <video
+        src={productVideo}
+        controls
+        className="rounded-lg w-full max-h-64 border border-slate-700"
+      />
+
+      <Button
+        type="button"
+        variant="destructive"
+        size="sm"
+        onClick={() => {
+          setProductVideo(null);
+          setSelectedVideoFile(null);
+          if (videoInputRef.current) videoInputRef.current.value = "";
+        }}
+        className="absolute top-2 right-2 h-8 w-8 p-0"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
+  )}
+</div>
+                  
                 </CollapsibleContent>
               </Collapsible>
 
