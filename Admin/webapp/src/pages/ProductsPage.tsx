@@ -174,11 +174,15 @@ export function ProductsPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const filesInputRef = useRef<HTMLInputElement>(null);
   
-  // Gallery images state
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
-  const [selectedGalleryFiles, setSelectedGalleryFiles] = useState<File[]>([]);
-  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
-  const galleryInputRef = useRef<HTMLInputElement>(null);
+ // Gallery images state
+const [galleryImages, setGalleryImages] = useState<string[]>([]);
+const [selectedGalleryFiles, setSelectedGalleryFiles] = useState<File[]>([]);
+const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+const galleryInputRef = useRef<HTMLInputElement>(null);
+
+// Gallery video state
+const [galleryVideos, setGalleryVideos] = useState<string[]>([]);
+const [selectedVideoFiles, setSelectedVideoFiles] = useState<File[]>([]);
   
   // Section expansion state
   const [isCardSectionOpen, setIsCardSectionOpen] = useState(true);
@@ -382,21 +386,46 @@ export function ProductsPage() {
         setIsUploadingImage(false);
       }
 
-      // Upload gallery images if selected - wait for ALL to complete before creating product
-      if (selectedGalleryFiles.length > 0) {
-        setIsUploadingGallery(true);
-        try {
-          // Upload each gallery image individually and wait for all to complete
-          const uploadPromises = selectedGalleryFiles.map(file => uploadProductImage(file));
-          galleryUrls = await Promise.all(uploadPromises);
-        } catch (err) {
-          toast.error('Failed to upload gallery images. Product not created.');
-          setIsUploadingGallery(false);
-          setIsSubmitting(false);
-          return; // Do NOT create product if any gallery upload fails
-        }
-        setIsUploadingGallery(false);
-      }
+   // Upload gallery images + videos if selected
+if (selectedGalleryFiles.length > 0 || selectedVideoFiles.length > 0) {
+
+  setIsUploadingGallery(true);
+
+  try {
+
+    let uploadedImages: string[] = [];
+    let uploadedVideos: string[] = [];
+
+    // Upload images
+    if (selectedGalleryFiles.length > 0) {
+      const imageUploads = selectedGalleryFiles.map(file =>
+        uploadProductImage(file)
+      );
+      uploadedImages = await Promise.all(imageUploads);
+    }
+
+    // Upload videos
+    if (selectedVideoFiles.length > 0) {
+      const videoUploads = selectedVideoFiles.map(file =>
+        uploadProductImage(file)
+      );
+      uploadedVideos = await Promise.all(videoUploads);
+    }
+
+    // Combine both
+    galleryUrls = [...uploadedImages, ...uploadedVideos];
+
+  } catch (err) {
+
+    toast.error('Failed to upload gallery media. Product not created.');
+    setIsUploadingGallery(false);
+    setIsSubmitting(false);
+    return;
+
+  }
+
+  setIsUploadingGallery(false);
+}
 
       // Create product with uploaded image URLs
       const API_BASE = "https://api.fluidtradingsystems.com";
@@ -450,6 +479,8 @@ export function ProductsPage() {
       setSelectedFiles([]);
       setGalleryImages([]);
       setSelectedGalleryFiles([]);
+      setGalleryVideos([]);
+setSelectedVideoFiles([]);
       // Refresh data from API
       await refreshProducts();
     } catch (error) {
@@ -1000,37 +1031,42 @@ export function ProductsPage() {
   )}
 </div>
 
-                  {/* Display Gallery Upload */}
-                  <div className="space-y-2">
-                    <Label className="text-slate-300">Display Gallery</Label>
-                    <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB each • Max 6 images</p>
-                    
-                 
-  <input
+ 
+                 {/* Display Gallery Upload */}
+<div className="space-y-2">
+  <Label className="text-slate-300">Display Gallery</Label>
+  <p className="text-xs text-slate-500">
+    PNG, JPG, WebP (Max 6) • MP4, WebM, MOV (Max 2 videos)
+  </p>
+
+<input
   type="file"
   ref={galleryInputRef}
   onChange={handleGalleryImageSelect}
-  accept="image/png,image/jpeg,image/jpg,image/webp"
+  accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/webm,video/quicktime"
   multiple
   className="hidden"
 />
-                    <Button
+
+<Button
   type="button"
   variant="outline"
   onClick={() => galleryInputRef.current?.click()}
-  disabled={galleryImages.length >= 6}
+  disabled={galleryImages.length >= 6 && galleryVideos.length >= 2}
   className="w-full border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50"
 >
   <Image className="h-4 w-4 mr-2" />
-  Add Gallery Images ({galleryImages.length}/6)
+  Add Media ({galleryImages.length}/6 images • {galleryVideos.length}/2 videos)
 </Button>
 
 {/* Gallery Preview Grid */}
-{galleryImages.length > 0 && (
+{(galleryImages.length > 0 || galleryVideos.length > 0) && (
   <div className="grid grid-cols-4 gap-2 mt-3">
+
+    {/* IMAGE PREVIEWS */}
     {galleryImages.map((img, index) => (
       <div
-        key={index}
+        key={`img-${index}`}
         className="group relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700"
       >
         <img
@@ -1046,16 +1082,40 @@ export function ProductsPage() {
           onClick={() => removeGalleryImage(index)}
           className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition"
         >
-                 
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    ))}
+
+    {/* VIDEO PREVIEWS */}
+    {galleryVideos.map((video, index) => (
+      <div
+        key={`video-${index}`}
+        className="group relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700"
+      >
+        <video
+          src={video}
+          className="w-full h-full object-cover"
+          controls
+        />
+
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() =>
+            setGalleryVideos(prev => prev.filter((_, i) => i !== index))
+          }
+          className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition"
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    ))}
+
+  </div>
+)}
+</div>
 
               {/* Product Files Section */}
               <div className="space-y-2 pt-4 border-t border-slate-800">
