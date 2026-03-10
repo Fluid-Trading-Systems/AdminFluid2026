@@ -765,14 +765,12 @@ export function ProductsPage() {
                     <Label className="text-slate-300">Product Card Image</Label>
                     <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB</p>
                     
-                <input
+           <input
   type="file"
-  ref={filesInputRef}
-  onChange={handleFilesSelect}
-  accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
-  multiple
+  ref={imageInputRef}
+  onChange={handleImageSelect}
+  accept="image/png,image/jpeg,image/jpg,image/webp"
   className="hidden"
-  {...({ webkitdirectory: "", directory: "" } as any)}
 />
 
                     
@@ -1010,12 +1008,11 @@ export function ProductsPage() {
                  
   <input
   type="file"
-  ref={filesInputRef}
-  onChange={handleFilesSelect}
-  accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
+  ref={galleryInputRef}
+  onChange={handleGalleryImageSelect}
+  accept="image/png,image/jpeg,image/jpg,image/webp"
   multiple
   className="hidden"
-  {...({ webkitdirectory: "", directory: "" } as any)}
 />
                     <Button
   type="button"
@@ -1065,15 +1062,14 @@ export function ProductsPage() {
                 <Label className="text-slate-300">Product Files</Label>
                 <p className="text-xs text-slate-500">ZIP, RAR, PDF, TXT, DLL, EX5, CS</p>
                 
-                <input
+        <input
   type="file"
   ref={filesInputRef}
   onChange={handleFilesSelect}
   accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
   multiple
-  webkitdirectory=""
-  directory=""
   className="hidden"
+  {...({ webkitdirectory: true, directory: true } as any)}
 />
                 
                 <Button
