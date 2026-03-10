@@ -765,8 +765,7 @@ export function ProductsPage() {
                     <Label className="text-slate-300">Product Card Image</Label>
                     <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB</p>
                     
-                
-<input
+                <input
   type="file"
   ref={filesInputRef}
   onChange={handleFilesSelect}
@@ -775,6 +774,7 @@ export function ProductsPage() {
   className="hidden"
   {...({ webkitdirectory: "", directory: "" } as any)}
 />
+
                     
                     {!imagePreview ? (
                       <Button
@@ -1007,7 +1007,7 @@ export function ProductsPage() {
                     <Label className="text-slate-300">Display Gallery</Label>
                     <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB each • Max 6 images</p>
                     
-                    <input
+                 
   <input
   type="file"
   ref={filesInputRef}
