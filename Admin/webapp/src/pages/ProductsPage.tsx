@@ -320,51 +320,56 @@ setSelectedVideoFiles([]);
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Gallery image handlers
-  const handleGalleryImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+  // Gallery media handlers (images + videos)
+const handleGalleryImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = Array.from(e.target.files || []);
+  if (files.length === 0) return;
 
-    // Check total limit
-    const currentCount = galleryImages.length;
-    const remainingSlots = 6 - currentCount;
-    
-    if (remainingSlots <= 0) {
-      toast.error('Maximum 6 gallery images allowed');
-      return;
-    }
+  files.forEach(file => {
 
-    const filesToAdd = files.slice(0, remainingSlots);
+    // IMAGE
+    if (file.type.startsWith("image/")) {
 
-    // Validate file types
-    const validFiles = filesToAdd.filter(file => {
+      if (galleryImages.length >= 6) {
+        toast.error("Maximum 6 images allowed");
+        return;
+      }
+
       if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-        toast.error(`${file.name} is not a valid image file`);
-        return false;
+        toast.error(`${file.name} is not a valid image`);
+        return;
       }
-      if (file.size > MAX_IMAGE_SIZE) {
-        toast.error(`${file.name} exceeds 2MB limit`);
-        return false;
-      }
-      return true;
-    });
 
-    setSelectedGalleryFiles(prev => [...prev, ...validFiles]);
-    
-    // Create previews
-    validFiles.forEach(file => {
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error(`${file.name} exceeds 2MB`);
+        return;
+      }
+
+      setSelectedGalleryFiles(prev => [...prev, file]);
+
       const reader = new FileReader();
       reader.onload = (event) => {
         setGalleryImages(prev => [...prev, event.target?.result as string]);
       };
       reader.readAsDataURL(file);
-    });
-  };
+    }
 
-  const removeGalleryImage = (index: number) => {
-    setGalleryImages(prev => prev.filter((_, i) => i !== index));
-    setSelectedGalleryFiles(prev => prev.filter((_, i) => i !== index));
-  };
+    // VIDEO
+    else if (file.type.startsWith("video/")) {
+
+      if (galleryVideos.length >= 2) {
+        toast.error("Maximum 2 videos allowed");
+        return;
+      }
+
+      setSelectedVideoFiles(prev => [...prev, file]);
+
+      const url = URL.createObjectURL(file);
+      setGalleryVideos(prev => [...prev, url]);
+    }
+
+  });
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
