@@ -471,15 +471,15 @@ if (selectedVideoFile) {
       const newProduct = await res.json();
       toast.success('Product created successfully');
 
-      // Upload product files if any (these are attached to the product after creation)
-      if (selectedFiles.length > 0 && newProduct?.id)
-        try {
-          await uploadProductFiles(newProduct.id, selectedFiles);
-          toast.success(`${selectedFiles.length} file(s) uploaded`);
-        } catch (err) {
-          toast.error('Some files failed to upload');
-        }
-      }
+      // Upload product files if any
+if (selectedFiles.length > 0 && newProduct?.id) {
+  try {
+    await uploadProductFiles(newProduct.id, selectedFiles);
+    toast.success(`${selectedFiles.length} file(s) uploaded`);
+  } catch (err) {
+    toast.error('Some files failed to upload');
+  }
+}
 
       setIsDialogOpen(false);
       // Reset form
