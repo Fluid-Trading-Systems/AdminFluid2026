@@ -174,15 +174,17 @@ export function ProductsPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const filesInputRef = useRef<HTMLInputElement>(null);
   
- // Gallery images state
-const [galleryImages, setGalleryImages] = useState<string[]>([]);
-const [selectedGalleryFiles, setSelectedGalleryFiles] = useState<File[]>([]);
+ // Gallery media state (images + videos)
+type GalleryMedia = {
+  type: "image" | "video";
+  url: string;
+  file: File;
+};
+
+const [galleryMedia, setGalleryMedia] = useState<GalleryMedia[]>([]);
+
 const [isUploadingGallery, setIsUploadingGallery] = useState(false);
 const galleryInputRef = useRef<HTMLInputElement>(null);
-
-// Gallery video state
-const [galleryVideos, setGalleryVideos] = useState<string[]>([]);
-const [selectedVideoFiles, setSelectedVideoFiles] = useState<File[]>([]);
   
   // Section expansion state
   const [isCardSectionOpen, setIsCardSectionOpen] = useState(true);
@@ -236,10 +238,8 @@ const [selectedVideoFiles, setSelectedVideoFiles] = useState<File[]>([]);
     setImagePreview('');
     setSelectedImageFile(null);
     setSelectedFiles([]);
-   setGalleryImages([]);
-setSelectedGalleryFiles([]);
-setGalleryVideos([]);
-setSelectedVideoFiles([]);
+    setGalleryMedia([]);
+   
     setIsCardSectionOpen(true);
     setIsDetailsSectionOpen(false);
     setIsDialogOpen(true);
@@ -265,75 +265,29 @@ setSelectedVideoFiles([]);
     }
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+// ============================================
+// GALLERY MEDIA SELECT (IMAGES + VIDEOS)
+// ============================================
 
-    // Validate file type
-    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-      toast.error('Please select a valid image file (PNG, JPG, or WebP)');
-      return;
-    }
-
-    // Validate file size
-    if (file.size > MAX_IMAGE_SIZE) {
-      toast.error('Image must be less than 2MB');
-      return;
-    }
-
-    setSelectedImageFile(file);
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setImagePreview(event.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    // Validate file extensions
-    const validFiles = files.filter(file => {
-
-  // If folder upload (contains path), allow it
-  if ((file as any).webkitRelativePath) {
-    return true;
-  }
-
-  const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-  return ACCEPTED_FILE_TYPES.includes(ext);
-
-});
-
-    if (validFiles.length !== files.length) {
-      toast.error(`Some files were rejected. Accepted types: ${ACCEPTED_FILE_TYPES.join(', ')}`);
-    }
-
-    if (validFiles.length > 0) {
-      setSelectedFiles(prev => [...prev, ...validFiles]);
-    }
-  };
-
-  const removeSelectedFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Gallery media handlers (images + videos)
-const handleGalleryImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleGalleryMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
   const files = Array.from(e.target.files || []);
   if (files.length === 0) return;
 
-  files.forEach(file => {
+  const remainingSlots = 6 - galleryMedia.length;
 
+  if (remainingSlots <= 0) {
+    toast.error("Maximum 6 gallery items allowed");
+    return;
+  }
+
+  const filesToAdd = files.slice(0, remainingSlots);
+
+  filesToAdd.forEach((file) => {
+
+    // =========================
     // IMAGE
+    // =========================
     if (file.type.startsWith("image/")) {
-
-      if (galleryImages.length >= 6) {
-        toast.error("Maximum 6 images allowed");
-        return;
-      }
 
       if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
         toast.error(`${file.name} is not a valid image`);
@@ -345,94 +299,116 @@ const handleGalleryImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         return;
       }
 
-      setSelectedGalleryFiles(prev => [...prev, file]);
-
       const reader = new FileReader();
+
       reader.onload = (event) => {
-        setGalleryImages(prev => [...prev, event.target?.result as string]);
+        setGalleryMedia((prev) => [
+          ...prev,
+          {
+            type: "image",
+            url: event.target?.result as string,
+            file
+          }
+        ]);
       };
+
       reader.readAsDataURL(file);
     }
 
+    // =========================
     // VIDEO
+    // =========================
     else if (file.type.startsWith("video/")) {
 
-      if (galleryVideos.length >= 2) {
-        toast.error("Maximum 2 videos allowed");
-        return;
-      }
+      const videoUrl = URL.createObjectURL(file);
 
-      setSelectedVideoFiles(prev => [...prev, file]);
+      setGalleryMedia((prev) => [
+        ...prev,
+        {
+          type: "video",
+          url: videoUrl,
+          file
+        }
+      ]);
+    }
 
-      const url = URL.createObjectURL(file);
-      setGalleryVideos(prev => [...prev, url]);
+    else {
+      toast.error(`${file.name} is not a supported file`);
     }
 
   });
 };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      let imageUrl = "";
-      let galleryUrls: string[] = [];
+// ============================================
+// REMOVE MEDIA FROM GALLERY
+// ============================================
 
-      // Upload card image if selected
-      if (selectedImageFile) {
-        setIsUploadingImage(true);
-        try {
-          imageUrl = await uploadProductImage(selectedImageFile);
-        } catch (err) {
-          toast.error('Failed to upload card image');
-          setIsUploadingImage(false);
-          setIsSubmitting(false);
-          return;
-        }
-        setIsUploadingImage(false);
-      }
+const removeGalleryImage = (index: number) => {
+  setGalleryMedia(prev => prev.filter((_, i) => i !== index));
+};
 
-   // Upload gallery images + videos if selected
-if (selectedGalleryFiles.length > 0 || selectedVideoFiles.length > 0) {
 
-  setIsUploadingGallery(true);
+// ============================================
+// PRODUCT SUBMIT
+// ============================================
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
   try {
 
-    let uploadedImages: string[] = [];
-    let uploadedVideos: string[] = [];
+    let imageUrl = "";
+    let galleryUrls: string[] = [];
 
-    // Upload images
-    if (selectedGalleryFiles.length > 0) {
-      const imageUploads = selectedGalleryFiles.map(file =>
-        uploadProductImage(file)
-      );
-      uploadedImages = await Promise.all(imageUploads);
+    // =========================
+    // Upload card image
+    // =========================
+
+    if (selectedImageFile) {
+      setIsUploadingImage(true);
+
+      try {
+        imageUrl = await uploadProductImage(selectedImageFile);
+      } catch (err) {
+        toast.error('Failed to upload card image');
+        setIsUploadingImage(false);
+        setIsSubmitting(false);
+        return;
+      }
+
+      setIsUploadingImage(false);
     }
 
-    // Upload videos
-    if (selectedVideoFiles.length > 0) {
-      const videoUploads = selectedVideoFiles.map(file =>
-        uploadProductImage(file)
-      );
-      uploadedVideos = await Promise.all(videoUploads);
+
+    // =========================
+    // Upload gallery media
+    // =========================
+
+    if (galleryMedia.length > 0) {
+
+      setIsUploadingGallery(true);
+
+      try {
+
+      const uploadPromises = galleryMedia.map((item) => {
+  return uploadProductImage(item.file);
+});
+
+        galleryUrls = await Promise.all(uploadPromises);
+
+      } catch (err) {
+
+        toast.error('Failed to upload gallery media. Product not created.');
+        setIsUploadingGallery(false);
+        setIsSubmitting(false);
+        return;
+
+      }
+
+      setIsUploadingGallery(false);
     }
-
-    // Combine both
-    galleryUrls = [...uploadedImages, ...uploadedVideos];
-
-  } catch (err) {
-
-    toast.error('Failed to upload gallery media. Product not created.');
-    setIsUploadingGallery(false);
-    setIsSubmitting(false);
-    return;
-
-  }
-
-  setIsUploadingGallery(false);
-}
 
       // Create product with uploaded image URLs
       const API_BASE = "https://api.fluidtradingsystems.com";
@@ -484,10 +460,7 @@ if (selectedGalleryFiles.length > 0 || selectedVideoFiles.length > 0) {
       setImagePreview('');
       setSelectedImageFile(null);
       setSelectedFiles([]);
-      setGalleryImages([]);
-      setSelectedGalleryFiles([]);
-      setGalleryVideos([]);
-setSelectedVideoFiles([]);
+      setGalleryMedia([]);      
       // Refresh data from API
       await refreshProducts();
     } catch (error) {
@@ -1038,91 +1011,73 @@ setSelectedVideoFiles([]);
   )}
 </div>
 
- 
-                 {/* Display Gallery Upload */}
-<div className="space-y-2">
-  <Label className="text-slate-300">Display Gallery</Label>
-  <p className="text-xs text-slate-500">
-    PNG, JPG, WebP (Max 6) • MP4, WebM, MOV (Max 2 videos)
-  </p>
-
-<input
+                  {/* Display Gallery Upload */}
+                  <div className="space-y-2">
+                    <Label className="text-slate-300">Display Gallery</Label>
+                    <p className="text-xs text-slate-500">PNG, JPG, WebP, MP4, WebM • Max 6 items</p>
+                    
+                 
+  <input
   type="file"
   ref={galleryInputRef}
-  onChange={handleGalleryImageSelect}
-  accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/webm,video/quicktime"
+  onChange={handleGalleryMediaSelect}
+  accept="image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/webm"
   multiple
   className="hidden"
 />
-
-<Button
+                    <Button
   type="button"
   variant="outline"
   onClick={() => galleryInputRef.current?.click()}
-  disabled={galleryImages.length >= 6 && galleryVideos.length >= 2}
+  disabled={galleryMedia.length >= 6}
   className="w-full border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-50"
 >
   <Image className="h-4 w-4 mr-2" />
-  Add Media ({galleryImages.length}/6 images • {galleryVideos.length}/2 videos)
+  Add Gallery Images ({galleryMedia.length}/6)
 </Button>
 
 {/* Gallery Preview Grid */}
-{(galleryImages.length > 0 || galleryVideos.length > 0) && (
+{galleryMedia.length > 0 && (
   <div className="grid grid-cols-4 gap-2 mt-3">
-
-    {/* IMAGE PREVIEWS */}
-    {galleryImages.map((img, index) => (
+    {galleryMedia.map((media, index) => (
       <div
-        key={`img-${index}`}
+        key={index}
         className="group relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700"
       >
-        <img
-          src={img}
-          alt={`Gallery ${index + 1}`}
-          className="w-full h-full object-cover"
-        />
-
-        <Button
-          type="button"
-          variant="destructive"
-          size="sm"
-          onClick={() => removeGalleryImage(index)}
-          className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition"
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-    ))}
-
-    {/* VIDEO PREVIEWS */}
-    {galleryVideos.map((video, index) => (
-      <div
-        key={`video-${index}`}
-        className="group relative aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700"
-      >
-        <video
-          src={video}
-          className="w-full h-full object-cover"
-          controls
-        />
+        {media.type === "image" ? (
+  <img
+    src={media.url}
+    alt={`Gallery ${index + 1}`}
+    className="w-full h-full object-cover"
+  />
+) : (
+  <video
+    src={media.url}
+    className="w-full h-full object-cover"
+    muted
+    controls
+  />
+)}
 
         <Button
           type="button"
           variant="destructive"
           size="sm"
           onClick={() =>
-            setGalleryVideos(prev => prev.filter((_, i) => i !== index))
-          }
+  setGalleryMedia(prev => prev.filter((_, i) => i !== index))
+}
           className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition"
         >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-    ))}
-
-  </div>
-)}
-</div>
+                 
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
 
               {/* Product Files Section */}
               <div className="space-y-2 pt-4 border-t border-slate-800">
