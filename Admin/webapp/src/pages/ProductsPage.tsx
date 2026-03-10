@@ -1065,13 +1065,15 @@ export function ProductsPage() {
                 <p className="text-xs text-slate-500">ZIP, RAR, PDF, TXT, DLL, EX5, CS</p>
                 
                 <input
-                  type="file"
-                  ref={filesInputRef}
-                  onChange={handleFilesSelect}
-                  accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs"
-                  multiple
-                  className="hidden"
-                />
+  type="file"
+  ref={filesInputRef}
+  onChange={handleFilesSelect}
+  accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
+  multiple
+  webkitdirectory=""
+  directory=""
+  className="hidden"
+/>
                 
                 <Button
                   type="button"
