@@ -766,14 +766,14 @@ export function ProductsPage() {
                     <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB</p>
                     
                 
- <input
+<input
   type="file"
   ref={filesInputRef}
   onChange={handleFilesSelect}
   accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
   multiple
-  {...{ webkitdirectory: "", directory: "" }}
   className="hidden"
+  {...({ webkitdirectory: "", directory: "" } as any)}
 />
                     
                     {!imagePreview ? (
@@ -1008,13 +1008,14 @@ export function ProductsPage() {
                     <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB each • Max 6 images</p>
                     
                     <input
+  <input
   type="file"
   ref={filesInputRef}
   onChange={handleFilesSelect}
   accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
   multiple
-  {...{ webkitdirectory: "", directory: "" }}
   className="hidden"
+  {...({ webkitdirectory: "", directory: "" } as any)}
 />
                     <Button
   type="button"
