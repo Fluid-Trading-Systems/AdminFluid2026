@@ -113,7 +113,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/web
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 
 // Accepted file types for product files
-const ACCEPTED_FILE_TYPES = ['.zip', '.rar', '.pdf', '.txt', '.dll', '.ex5', '.cs'];
+const ACCEPTED_FILE_TYPES = ['.zip', '.rar', '.pdf', '.txt', '.dll', '.ex5', '.cs', '.algo'];
 
 interface ProductFormData {
   name: string;
@@ -290,9 +290,16 @@ export function ProductsPage() {
 
     // Validate file extensions
     const validFiles = files.filter(file => {
-      const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-      return ACCEPTED_FILE_TYPES.includes(ext);
-    });
+
+  // If folder upload (contains path), allow it
+  if ((file as any).webkitRelativePath) {
+    return true;
+  }
+
+  const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+  return ACCEPTED_FILE_TYPES.includes(ext);
+
+});
 
     if (validFiles.length !== files.length) {
       toast.error(`Some files were rejected. Accepted types: ${ACCEPTED_FILE_TYPES.join(', ')}`);
@@ -758,13 +765,17 @@ export function ProductsPage() {
                     <Label className="text-slate-300">Product Card Image</Label>
                     <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB</p>
                     
-                    <input
-                      type="file"
-                      ref={imageInputRef}
-                      onChange={handleImageSelect}
-                      accept=".png,.jpg,.jpeg,.webp"
-                      className="hidden"
-                    />
+                   <input
+ <input
+  type="file"
+  ref={filesInputRef}
+  onChange={handleFilesSelect}
+  accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
+  multiple
+  webkitdirectory
+  directory
+  className="hidden"
+/>
                     
                     {!imagePreview ? (
                       <Button
