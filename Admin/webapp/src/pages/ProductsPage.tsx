@@ -772,8 +772,7 @@ export function ProductsPage() {
   onChange={handleFilesSelect}
   accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
   multiple
-  webkitdirectory
-  directory
+  {...{ webkitdirectory: "", directory: "" }}
   className="hidden"
 />
                     
@@ -1009,13 +1008,14 @@ export function ProductsPage() {
                     <p className="text-xs text-slate-500">PNG, JPG, WebP • Max 2MB each • Max 6 images</p>
                     
                     <input
-                      type="file"
-                      ref={galleryInputRef}
-                      onChange={handleGalleryImageSelect}
-                      accept=".png,.jpg,.jpeg,.webp"
-                      multiple
-                      className="hidden"
-                    />
+  type="file"
+  ref={filesInputRef}
+  onChange={handleFilesSelect}
+  accept=".zip,.rar,.pdf,.txt,.dll,.ex5,.cs,.algo"
+  multiple
+  {...{ webkitdirectory: "", directory: "" }}
+  className="hidden"
+/>
                     <Button
   type="button"
   variant="outline"
