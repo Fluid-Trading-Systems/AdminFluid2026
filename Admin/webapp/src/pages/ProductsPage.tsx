@@ -472,15 +472,15 @@ if (selectedVideoFile) {
       toast.success('Product created successfully');
 
       // Upload product files if any
-if (selectedFiles.length > 0 && newProduct?.id) {
+// Upload product files if any
+if (selectedFiles.length > 0 && newProduct?.product?.id) {
   try {
-    await uploadProductFiles(newProduct.id, selectedFiles);
+    await uploadProductFiles(newProduct.product.id, selectedFiles);
     toast.success(`${selectedFiles.length} file(s) uploaded`);
   } catch (err) {
     toast.error('Some files failed to upload');
   }
 }
-
       setIsDialogOpen(false);
       // Reset form
       setFormData(initialFormData);
