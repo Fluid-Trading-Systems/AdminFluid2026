@@ -391,8 +391,9 @@ const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsSubmitting(true);
 
     try {
-      let imageUrl = "";
-      let galleryUrls: string[] = [];
+     let imageUrl = "";
+let galleryUrls: string[] = [];
+let videoUrl = "";
 
       // Upload card image if selected
       if (selectedImageFile) {
@@ -424,6 +425,17 @@ const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         setIsUploadingGallery(false);
       }
 
+      // Upload product video if selected
+if (selectedVideoFile) {
+  try {
+    videoUrl = await uploadProductImage(selectedVideoFile);
+  } catch (err) {
+    toast.error("Failed to upload video");
+    setIsSubmitting(false);
+    return;
+  }
+}
+
       // Create product with uploaded image URLs
       const API_BASE = "https://api.fluidtradingsystems.com";
       const res = await fetch(API_BASE + "/products", {
@@ -441,6 +453,7 @@ const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
           long_description: formData.long_description,
           image_url: imageUrl,
           gallery_images: galleryUrls.length > 0 ? galleryUrls : (imageUrl ? [imageUrl] : []),
+          video_url: videoUrl || null,
           plan_type: formData.plan_type.toLowerCase() || null,
           price_tier: null,
            rating: formData.rating,   // ⭐ ADD THIS
