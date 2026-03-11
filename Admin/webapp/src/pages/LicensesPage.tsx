@@ -213,10 +213,11 @@ export function LicensesPage() {
 
   const getStatusBadge = (status: License['status']) => {
     const styles = {
-      active: 'bg-green-500/10 text-green-400 border-green-500/20',
-      expired: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-      cancelled: 'bg-red-500/10 text-red-400 border-red-500/20',
-    };
+  active: 'bg-green-500/10 text-green-400 border-green-500/20',
+  expired: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+  cancelled: 'bg-red-500/10 text-red-400 border-red-500/20',
+  cancelling: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+};
 
     return (
       <Badge className={`${styles[status] || styles.active} capitalize`}>
@@ -357,17 +358,17 @@ export function LicensesPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Badge 
-                          variant="secondary" 
-                          className={`capitalize ${
-                            license?.type === 'lifetime' 
-                              ? 'bg-purple-500/10 text-purple-400' 
-                              : 'bg-blue-500/10 text-blue-400'
-                          }`}
-                        >
-                          {license?.type || 'monthly'}
-                        </Badge>
-                      </TableCell>
+  <Badge 
+    variant="secondary" 
+    className={`capitalize ${
+      license?.plan_type === 'lifetime' 
+        ? 'bg-purple-500/10 text-purple-400' 
+        : 'bg-blue-500/10 text-blue-400'
+    }`}
+  >
+    {license?.plan_type || 'monthly'}
+  </Badge>
+</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {getStatusBadge(license?.status || 'active')}
