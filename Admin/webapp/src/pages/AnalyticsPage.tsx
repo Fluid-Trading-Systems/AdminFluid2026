@@ -16,7 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-export function AnalyticsPage() {
+export default function AnalyticsPage() {
 
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
