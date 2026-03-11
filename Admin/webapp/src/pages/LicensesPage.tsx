@@ -211,20 +211,21 @@ export function LicensesPage() {
     }
   };
 
-  const getStatusBadge = (status: License['status']) => {
-    const styles = {
-  active: 'bg-green-500/10 text-green-400 border-green-500/20',
-  expired: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  cancelled: 'bg-red-500/10 text-red-400 border-red-500/20',
-  cancelling: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-};
+  const getStatusBadge = (status: string) => {
 
-    return (
-      <Badge className={`${styles[status] || styles.active} capitalize`}>
-        {status || 'unknown'}
-      </Badge>
-    );
+  const styles: Record<string, string> = {
+    active: 'bg-green-500/10 text-green-400 border-green-500/20',
+    expired: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+    cancelled: 'bg-red-500/10 text-red-400 border-red-500/20',
+    cancelling: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
   };
+
+  return (
+    <Badge className={`${styles[status] || styles.active} capitalize`}>
+      {status || 'unknown'}
+    </Badge>
+  );
+};
 
   const getProductName = (productId: number) => {
     const product = products.find((p) => Number(p?.id) === Number(productId));
