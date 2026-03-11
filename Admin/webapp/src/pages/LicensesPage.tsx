@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getLicenses, getProducts, createLicense, cancelLicense, reactivateLicense, deleteLicense } from '@/lib/api';
-import type { License, Product } from '@/types/api';
+import { getLicenses, createLicense, cancelLicense, reactivateLicense, deleteLicense } from '@/lib/api';
+import type { License } from '@/types/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,7 +48,6 @@ const initialFormData: CreateLicenseFormData = {
 export function LicensesPage() {
   const location = useLocation();
   const [licenses, setLicenses] = useState<License[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -61,44 +60,22 @@ export function LicensesPage() {
   const [formData, setFormData] = useState<CreateLicenseFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Initial load with loading spinner
-  const loadData = async () => {
-    setHasError(false);
-    setIsLoading(true);
-    try {
-      const [licensesData, productsData] = await Promise.all([
-        getLicenses(),
-        getProducts(),
-      ]);
-      setLicenses(Array.isArray(licensesData) ? licensesData : []);
-      setProducts(Array.isArray(productsData) ? productsData : []);
-    } catch (err) {
-      setHasError(true);
-      setLicenses([]);
-      setProducts([]);
-      toast.error('Failed to load data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const loadData = async () => {
+  setHasError(false);
+  setIsLoading(true);
 
-  // Silent refresh without loading spinner (used after mutations)
-  const refreshData = async () => {
-    setIsRefreshing(true);
-    try {
-      const [licensesData, productsData] = await Promise.all([
-        getLicenses(),
-        getProducts(),
-      ]);
-      setLicenses(Array.isArray(licensesData) ? licensesData : []);
-      setProducts(Array.isArray(productsData) ? productsData : []);
-    } catch (err) {
-      toast.error('Failed to refresh data');
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
+  try {
+    const licensesData = await getLicenses();
+    setLicenses(Array.isArray(licensesData) ? licensesData : []);
+  } catch (err) {
+    setHasError(true);
+    setLicenses([]);
+    toast.error('Failed to load data');
+  } finally {
+    setIsLoading(false);
+  }
+};
+  
   useEffect(() => {
     loadData();
   }, []);
@@ -119,25 +96,39 @@ export function LicensesPage() {
     (license?.product || '').toLowerCase().includes(searchQuery.toLowerCase())
 );
 
-  const handleOpenCreate = () => {
-    setFormData(initialFormData);
-    setIsDialogOpen(true);
-  };
+// Refresh licenses after changes
+const refreshData = async () => {
+  setIsRefreshing(true);
 
-  const handleOpenCancel = (license: License) => {
-    setSelectedLicense(license);
-    setIsCancelDialogOpen(true);
-  };
+  try {
+    const licensesData = await getLicenses();
+    setLicenses(Array.isArray(licensesData) ? licensesData : []);
+  } catch (err) {
+    toast.error('Failed to refresh data');
+  } finally {
+    setIsRefreshing(false);
+  }
+};
 
-  const handleOpenReactivate = (license: License) => {
-    setSelectedLicense(license);
-    setIsReactivateDialogOpen(true);
-  };
+const handleOpenCreate = () => {
+  setFormData(initialFormData);
+  setIsDialogOpen(true);
+};
 
-  const handleOpenDelete = (license: License) => {
-    setSelectedLicense(license);
-    setIsDeleteDialogOpen(true);
-  };
+const handleOpenCancel = (license: License) => {
+  setSelectedLicense(license);
+  setIsCancelDialogOpen(true);
+};
+
+const handleOpenReactivate = (license: License) => {
+  setSelectedLicense(license);
+  setIsReactivateDialogOpen(true);
+};
+
+const handleOpenDelete = (license: License) => {
+  setSelectedLicense(license);
+  setIsDeleteDialogOpen(true);
+};
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -146,37 +137,40 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     await createLicense({
+      product_id: "1", // default product id
       plan_type: formData.plan_type,
       email: formData.email
     });
-  
-      toast.success('License created successfully');
-      setIsDialogOpen(false);
-      // Reset form
-      setFormData(initialFormData);
-      // Refresh both licenses and products from API
-      await refreshData();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create license');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
-  const handleCancel = async () => {
-    if (!selectedLicense) return;
+    toast.success('License created successfully');
+    setIsDialogOpen(false);
+    setFormData(initialFormData);
 
-    try {
-      await cancelLicense(selectedLicense.license_key);
-      toast.success('License cancelled successfully');
-      setIsCancelDialogOpen(false);
-      setSelectedLicense(null);
-      // Refresh data from API
-      await refreshData();
-    } catch (error) {
-      toast.error('Failed to cancel license');
-    }
-  };
+    await refreshData();
+
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'Failed to create license');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+const handleCancel = async () => {
+  if (!selectedLicense) return;
+
+  try {
+    await cancelLicense(selectedLicense.license_key);
+
+    toast.success('License cancelled successfully');
+    setIsCancelDialogOpen(false);
+    setSelectedLicense(null);
+
+    await refreshData();
+
+  } catch (error) {
+    toast.error('Failed to cancel license');
+  }
+};
 
   const handleReactivate = async () => {
     if (!selectedLicense) return;
