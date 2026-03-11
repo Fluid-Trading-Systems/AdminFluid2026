@@ -38,12 +38,12 @@ import { toast } from 'sonner';
 
 interface CreateLicenseFormData {
   product_id: string;
-  type: 'monthly' | 'lifetime';
+  plan_type: 'monthly' | 'lifetime';
 }
 
 const initialFormData: CreateLicenseFormData = {
   product_id: '',
-  type: 'monthly',
+  plan_type: 'monthly',
 };
 
 export function LicensesPage() {
@@ -150,9 +150,9 @@ export function LicensesPage() {
     setIsSubmitting(true);
     try {
       await createLicense({
-        product_id: formData.product_id,
-        type: formData.type,
-      });
+  product_id: formData.product_id,
+  plan_type: formData.plan_type,
+});
       toast.success('License created successfully');
       setIsDialogOpen(false);
       // Reset form
@@ -488,8 +488,8 @@ export function LicensesPage() {
                 </Label>
                 <select
                   id="type"
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as 'monthly' | 'lifetime' })}
+                 value={formData.plan_type}
+onChange={(e) => setFormData({ ...formData, plan_type: e.target.value as 'monthly' | 'lifetime' })}
                   className="w-full bg-slate-950 border border-slate-700 text-white rounded-md px-3 py-2"
                   required
                 >
