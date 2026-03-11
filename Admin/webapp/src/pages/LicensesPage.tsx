@@ -39,11 +39,13 @@ import { toast } from 'sonner';
 interface CreateLicenseFormData {
   product_id: string;
   plan_type: 'monthly' | 'lifetime';
+  email: string;
 }
 
 const initialFormData: CreateLicenseFormData = {
   product_id: '',
   plan_type: 'monthly',
+  email: '',
 };
 
 export function LicensesPage() {
@@ -152,6 +154,7 @@ export function LicensesPage() {
     await createLicense({
   product_id: formData.product_id,
   plan_type: formData.plan_type,
+  email: formData.email,
 });
       toast.success('License created successfully');
       setIsDialogOpen(false);
@@ -463,6 +466,22 @@ export function LicensesPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="space-y-4 py-4">
+              <div className="space-y-2">
+  <Label htmlFor="email" className="text-slate-300">
+    Customer Email *
+  </Label>
+  <Input
+    id="email"
+    type="email"
+    placeholder="customer@email.com"
+    value={formData.email}
+    onChange={(e) =>
+      setFormData({ ...formData, email: e.target.value })
+    }
+    className="bg-slate-950 border-slate-700 text-white"
+    required
+  />
+</div>
               <div className="space-y-2">
                 <Label htmlFor="product" className="text-slate-300">
                   Product *
