@@ -1,4 +1,3 @@
-```tsx
 import { useState, useEffect } from "react";
 import { getAdminStats } from "@/lib/api";
 import type { AdminStats } from "@/types/api";
