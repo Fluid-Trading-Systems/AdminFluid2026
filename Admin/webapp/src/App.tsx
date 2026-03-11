@@ -10,7 +10,6 @@ import { LicensesPage } from '@/pages/LicensesPage';
 import CustomersPage from '@/pages/CustomersPage';
 import OrdersPage from '@/pages/OrdersPage';
 import { ApiKeysPage } from '@/pages/ApiKeysPage';
-import { ActivityPage } from '@/pages/ActivityPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
 
 function App() {
