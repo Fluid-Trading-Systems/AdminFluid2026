@@ -87,10 +87,12 @@ export interface License {
   license_key: string
   email?: string
   product_id: number
-  type: 'monthly' | 'lifetime'
-  status: 'active' | 'expired' | 'cancelled'
+  plan_type: 'monthly' | 'lifetime'
+  status: 'active' | 'expired' | 'cancelled' | 'cancelling'
   created_at: string
   expires_at: string | null
+  next_renewal?: string | null
+  cancel_at?: string | null
 }
 
 // Customers
