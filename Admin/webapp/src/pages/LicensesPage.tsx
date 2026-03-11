@@ -117,7 +117,7 @@ export function LicensesPage() {
   (license) =>
     (license?.license_key || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (license?.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    String(license?.product_id || '').toLowerCase().includes(searchQuery.toLowerCase())
+    (license?.product || '').toLowerCase().includes(searchQuery.toLowerCase())
 );
 
   const handleOpenCreate = () => {
@@ -354,7 +354,7 @@ export function LicensesPage() {
 </TableCell>
                       <TableCell>
                         <span className="text-white text-sm">
-                          {getProductName(license?.product_id)}
+                          {license?.product || getProductName(license?.product_id)}
                         </span>
                       </TableCell>
                       <TableCell>
