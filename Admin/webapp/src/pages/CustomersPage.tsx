@@ -36,7 +36,7 @@ export default function CustomersPage() {
     const request: CreateLicenseRequest = {
       email,
       product_id: "1",
-      type: "lifetime",
+      plan_type: "lifetime",
     };
 
     await createLicense(request);
