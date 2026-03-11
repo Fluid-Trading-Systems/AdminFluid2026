@@ -35,7 +35,6 @@ function App() {
             <Route path="customers" element={<CustomersPage />} />
             <Route path="orders" element={<OrdersPage />} />            
             <Route path="api-keys" element={<ApiKeysPage />} />
-            <Route path="activity" element={<ActivityPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
           </Route>
 
