@@ -83,16 +83,16 @@ export interface ProductFile {
 
 // Licenses
 export interface License {
-  id: number
   license_key: string
-  email?: string
+  email: string
   product_id: number
-  plan_type: 'monthly' | 'lifetime'
-  status: 'active' | 'expired' | 'cancelled' | 'cancelling'
+  product?: string
+  plan_type: string
+  status: string
   created_at: string
-  expires_at: string | null
-  next_renewal?: string | null
-  cancel_at?: string | null
+  expires_at?: string
+  next_renewal?: string
+  cancel_at?: string
 }
 
 // Customers
