@@ -152,7 +152,7 @@ export function LicensesPage() {
     setIsSubmitting(true);
     try {
     await createLicense({
-  product_id: Number(formData.product_id),
+  product_id: formData.product_id,
   plan_type: formData.plan_type,
   email: formData.email
 });
