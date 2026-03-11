@@ -21,7 +21,6 @@ import {
   LogOut,
   ChevronDown,
   TrendingUp,
-  Activity,
   PieChart,
   Users,
   CreditCard
@@ -36,7 +35,6 @@ const navigation = [
   { name: 'Orders', href: '/dashboard/orders', icon: CreditCard },
 
   { name: 'API Keys', href: '/dashboard/api-keys', icon: Key },
-  { name: 'Activity', href: '/dashboard/activity', icon: Activity },
   { name: 'Analytics', href: '/dashboard/analytics', icon: PieChart },
 ];
 
