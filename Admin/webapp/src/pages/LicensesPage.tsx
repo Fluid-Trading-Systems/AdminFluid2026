@@ -37,17 +37,14 @@ import { Plus, Loader2, FileText, Search, Key, RotateCcw, Ban, Calendar, AlertCi
 import { toast } from 'sonner';
 
 interface CreateLicenseFormData {
-  product_id: string;
   plan_type: 'monthly' | 'lifetime';
   email: string;
 }
 
 const initialFormData: CreateLicenseFormData = {
-  product_id: '',
   plan_type: 'monthly',
   email: '',
 };
-
 export function LicensesPage() {
   const location = useLocation();
   const [licenses, setLicenses] = useState<License[]>([]);
@@ -142,20 +139,17 @@ export function LicensesPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.product_id) {
-      toast.error('Please select a product');
-      return;
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    setIsSubmitting(true);
-    try {
+  setIsSubmitting(true);
+
+  try {
     await createLicense({
-  product_id: formData.product_id,
-  plan_type: formData.plan_type,
-  email: formData.email
-});
+      plan_type: formData.plan_type,
+      email: formData.email
+    });
+  
       toast.success('License created successfully');
       setIsDialogOpen(false);
       // Reset form
@@ -479,26 +473,7 @@ export function LicensesPage() {
     required
   />
 </div>
-              <div className="space-y-2">
-                <Label htmlFor="product" className="text-slate-300">
-                  Product *
-                </Label>
-                <select
-                  id="product"
-                  value={formData.product_id}
-                  onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-700 text-white rounded-md px-3 py-2"
-                  required
-                >
-                  <option value="">Select a product</option>
-                  {products.map((product) => (
-                    <option key={product.id} value={String(product.id)}>
-  {product.id} - {product.name} (${product.price})
-</option>
-                  ))}
-                </select>
-              </div>
-
+              
               <div className="space-y-2">
                 <Label htmlFor="type" className="text-slate-300">
                   License Type *
