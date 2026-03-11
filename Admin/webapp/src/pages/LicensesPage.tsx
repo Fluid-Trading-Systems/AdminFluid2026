@@ -152,9 +152,9 @@ export function LicensesPage() {
     setIsSubmitting(true);
     try {
     await createLicense({
-  product_id: formData.product_id,
+  product_id: Number(formData.product_id),
   plan_type: formData.plan_type,
-  email: formData.email,
+  email: formData.email
 });
       toast.success('License created successfully');
       setIsDialogOpen(false);
@@ -495,9 +495,9 @@ export function LicensesPage() {
                 >
                   <option value="">Select a product</option>
                   {products.map((product) => (
-                    <option key={product?.id || Math.random()} value={product?.id || ''}>
-                      {product?.name || 'Unnamed Product'} - ${product?.price || '-'}
-                    </option>
+                    <option key={product.id} value={String(product.id)}>
+  {product.id} - {product.name} (${product.price})
+</option>
                   ))}
                 </select>
               </div>
