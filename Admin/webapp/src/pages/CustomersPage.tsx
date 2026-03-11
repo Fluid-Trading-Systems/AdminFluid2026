@@ -30,20 +30,27 @@ export default function CustomersPage() {
     loadCustomers();
   }, []);
 
+  
   const handleCreateLicense = async (email: string) => {
-    try {
- const request: CreateLicenseRequest = {
-  email,
-  product_id: "1",
-  type: "lifetime",
-};
-await createLicense(request);
+  try {
+    const request: CreateLicenseRequest = {
+      email,
+      product_id: "1",
+      type: "lifetime",
+    };
 
-      toast.success("License generated for customer");
-    } catch {
-      toast.error("Failed to create license");
-    }
-  };
+    await createLicense(request);
+
+    toast.success("License generated for customer");
+
+    // refresh table
+    loadCustomers();
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to create license");
+  }
+};
 
   return (
     <div className="space-y-6">
