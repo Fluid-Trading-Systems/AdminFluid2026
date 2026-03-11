@@ -230,10 +230,7 @@ export function LicensesPage() {
   );
 };
 
-  const getProductName = (productId: number) => {
-    const product = products.find((p) => Number(p?.id) === Number(productId));
-    return product?.name || '';
-  };
+  
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Never';
