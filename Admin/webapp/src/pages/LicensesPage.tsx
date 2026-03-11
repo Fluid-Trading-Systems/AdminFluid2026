@@ -328,7 +328,9 @@ export function LicensesPage() {
     <TableHead className="text-slate-400">Type</TableHead>
                     <TableHead className="text-slate-400">Status</TableHead>
                     <TableHead className="text-slate-400">Created</TableHead>
-                    <TableHead className="text-slate-400">Expires</TableHead>
+<TableHead className="text-slate-400">Renews</TableHead>
+<TableHead className="text-slate-400">Cancels</TableHead>
+<TableHead className="text-slate-400">Expires</TableHead>
                     <TableHead className="text-slate-400 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -377,18 +379,34 @@ export function LicensesPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-slate-500" />
-                          <span className="text-slate-300 text-sm">
-                            {formatDateTime(license?.created_at || '')}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`text-sm ${license?.expires_at ? 'text-slate-300' : 'text-slate-500'}`}>
-                          {formatDate(license?.expires_at || null)}
-                        </span>
-                      </TableCell>
+  <div className="flex items-center gap-2">
+    <Calendar className="h-4 w-4 text-slate-500" />
+    <span className="text-slate-300 text-sm">
+      {formatDateTime(license?.created_at || '')}
+    </span>
+  </div>
+</TableCell>
+
+{/* Renews */}
+<TableCell>
+  <span className="text-slate-300 text-sm">
+    {license?.next_renewal ? formatDate(license.next_renewal) : '-'}
+  </span>
+</TableCell>
+
+{/* Cancels */}
+<TableCell>
+  <span className="text-orange-400 text-sm">
+    {license?.cancel_at ? formatDate(license.cancel_at) : '-'}
+  </span>
+</TableCell>
+
+{/* Expires */}
+<TableCell>
+  <span className={`text-sm ${license?.expires_at ? 'text-slate-300' : 'text-slate-500'}`}>
+    {formatDate(license?.expires_at || null)}
+  </span>
+</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           {license?.status === 'active' ? (
