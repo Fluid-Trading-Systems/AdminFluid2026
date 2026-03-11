@@ -355,7 +355,7 @@ export function LicensesPage() {
 </TableCell>
                       <TableCell>
                         <span className="text-white text-sm">
-                          {license?.product || getProductName(license?.product_id)}
+                          {getProductName(Number(license?.product_id)) || license?.product_id}
                         </span>
                       </TableCell>
                       <TableCell>
