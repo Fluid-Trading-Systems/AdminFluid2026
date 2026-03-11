@@ -151,7 +151,7 @@ export function LicensesPage() {
     try {
       await createLicense({
   product_id: formData.product_id,
-  plan_type: formData.plan_type,
+  plan_type: formData.type,
 });
       toast.success('License created successfully');
       setIsDialogOpen(false);
