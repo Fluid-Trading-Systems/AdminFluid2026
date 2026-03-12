@@ -260,18 +260,32 @@ export async function uploadProductGalleryImages(productId: string, files: File[
   return uploadedUrls;
 }
 
-// POST /products/:id/files - Upload product files
 export async function uploadProductFiles(productId: string, files: File[]): Promise<ProductFile[]> {
-  const uploadedFiles: ProductFile[] = [];
-  
-  for (const file of files) {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const res = await apiFetch(`/products/${productId}/files`, {
-      method: 'POST',
-      body: formData,
-    });
+
+  const form = new FormData();
+
+  form.append("product_id", productId);
+
+  files.forEach(file => {
+    form.append("files", file);
+  });
+
+  const res = await fetch(API_BASE + "/upload/product-files", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer owner_session"
+    },
+    body: form
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+
+  const data = await res.json();
+  return data.files || [];
+}
     
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({ error: `Failed to upload ${file.name}` }));
