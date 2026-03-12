@@ -11,6 +11,7 @@ import CustomersPage from '@/pages/CustomersPage';
 import OrdersPage from '@/pages/OrdersPage';
 import { ApiKeysPage } from '@/pages/ApiKeysPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
+import SecurityPage from '@/pages/SecurityPage';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="orders" element={<OrdersPage />} />            
             <Route path="api-keys" element={<ApiKeysPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="security" element={<SecurityPage />} />
           </Route>
 
           {/* Redirect root to dashboard */}
