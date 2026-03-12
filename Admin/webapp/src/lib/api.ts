@@ -156,66 +156,57 @@ export async function getAdminApiKeys(): Promise<ApiKeyItem[]> {
   }
 }
 
-// ========== PRODUCTS API ==========
 
-// GET /products
-export async function getProducts(): Promise<Product[]> {
-  try {
-    const res = await apiFetch("/products", apiFetchWithBody('GET'));
-    
-    if (!res.ok) {
-      return [];
-    }
-    
-    const data = await res.json();
-    return data.products || [];
-  } catch (error) {
-    return [];
-  }
-}
+// ==========================
+// PRODUCTS API
+// ==========================
 
 // POST /products
 export async function createProduct(product: CreateProductRequest): Promise<Product> {
-  const res = await apiFetch("/products", apiFetchWithBody('POST', product));
-  
+  const res = await apiFetch("/products", apiFetchWithBody("POST", product));
+
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ error: 'Failed to create product' }));
-    throw new Error(errorData.error || errorData.message || 'Failed to create product');
+    const errorData = await res.json().catch(() => ({ error: "Failed to create product" }));
+    throw new Error(errorData.error || errorData.message || "Failed to create product");
   }
-  
+
   const data = await res.json();
   return data.product || data;
 }
 
 // DELETE /products/:id
 export async function deleteProduct(id: string): Promise<void> {
-  const res = await apiFetch(`/products/${id}`, apiFetchWithBody('DELETE'));
-  
+  const res = await apiFetch(`/products/${id}`, apiFetchWithBody("DELETE"));
+
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ error: 'Failed to delete product' }));
-    throw new Error(errorData.error || errorData.message || 'Failed to delete product');
+    const errorData = await res.json().catch(() => ({ error: "Failed to delete product" }));
+    throw new Error(errorData.error || errorData.message || "Failed to delete product");
   }
 }
 
-// ========== PRODUCT FILES API ==========
+// ==========================
+// PRODUCT FILES API
+// ==========================
 
 // GET /products/:id/files
 export async function getProductFiles(productId: string): Promise<ProductFile[]> {
   try {
-    const res = await apiFetch(`/products/${productId}/files`, apiFetchWithBody('GET'));
-    
-    if (!res.ok) {
-      return [];
-    }
-    
+    const res = await apiFetch(`/products/${productId}/files`, apiFetchWithBody("GET"));
+
+    if (!res.ok) return [];
+
     const data = await res.json();
     return data.files || [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
 
-// POST /upload/product-image - Upload product card image
+// ==========================
+// IMAGE UPLOAD
+// ==========================
+
+// POST /upload/product-image
 export async function uploadProductImage(file: File): Promise<string> {
   const fd = new FormData();
   fd.append("file", file);
@@ -223,47 +214,30 @@ export async function uploadProductImage(file: File): Promise<string> {
   const res = await fetch(API_BASE + "/upload/product-image", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer owner_session"
+      Authorization: "Bearer owner_session"
     },
     body: fd
   });
 
-  if (!res.ok) throw new Error("Image upload failed");
+  if (!res.ok) {
+    throw new Error("Image upload failed");
+  }
 
   const data = await res.json();
-  return data.url; // IMPORTANT: USE THIS VALUE
+  return data.url;
 }
 
-// POST /upload/product-gallery - Upload product gallery images
-export async function uploadProductGalleryImages(productId: string, files: File[]): Promise<string[]> {
-  const uploadedUrls: string[] = [];
-  
-  for (const file of files) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('product_id', productId);
-    
-    const res = await apiFetch("/upload/product-gallery", {
-      method: 'POST',
-      body: formData,
-    });
-    
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: `Failed to upload ${file.name}` }));
-      throw new Error(errorData.error || errorData.message || `Failed to upload ${file.name}`);
-    }
-    
-    const data = await res.json();
-    uploadedUrls.push(data.url || data.image_url);
-  }
-  
-  return uploadedUrls;
-}
+// ==========================
+// PRODUCT FILE UPLOAD
+// ==========================
 
-export async function uploadProductFiles(productId: string, files: File[]): Promise<ProductFile[]> {
+// POST /upload/product-files
+export async function uploadProductFiles(
+  productId: string,
+  files: File[]
+): Promise<ProductFile[]> {
 
   const form = new FormData();
-
   form.append("product_id", productId);
 
   files.forEach(file => {
@@ -273,7 +247,7 @@ export async function uploadProductFiles(productId: string, files: File[]): Prom
   const res = await fetch(API_BASE + "/upload/product-files", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer owner_session"
+      Authorization: "Bearer owner_session"
     },
     body: form
   });
@@ -286,56 +260,44 @@ export async function uploadProductFiles(productId: string, files: File[]): Prom
   const data = await res.json();
   return data.files || [];
 }
-    
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: `Failed to upload ${file.name}` }));
-      throw new Error(errorData.error || errorData.message || `Failed to upload ${file.name}`);
-    }
-    
-    const data = await res.json();
-    uploadedFiles.push(data.file || data);
-  }
-  
-  return uploadedFiles;
-}
 
 // DELETE /products/:productId/files/:fileId
 export async function deleteProductFile(productId: string, fileId: string): Promise<void> {
-  const res = await apiFetch(`/products/${productId}/files/${fileId}`, apiFetchWithBody('DELETE'));
-  
+  const res = await apiFetch(`/products/${productId}/files/${fileId}`, apiFetchWithBody("DELETE"));
+
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ error: 'Failed to delete file' }));
-    throw new Error(errorData.error || errorData.message || 'Failed to delete file');
+    const errorData = await res.json().catch(() => ({ error: "Failed to delete file" }));
+    throw new Error(errorData.error || errorData.message || "Failed to delete file");
   }
 }
 
-// ========== LICENSES API ==========
+// ==========================
+// LICENSES API
+// ==========================
 
 // GET /licenses
 export async function getLicenses(): Promise<License[]> {
   try {
-    const res = await apiFetch("/licenses", apiFetchWithBody('GET'));
-    
-    if (!res.ok) {
-      return [];
-    }
-    
+    const res = await apiFetch("/licenses", apiFetchWithBody("GET"));
+
+    if (!res.ok) return [];
+
     const data = await res.json();
     return data.licenses || [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
 
 // POST /licenses
 export async function createLicense(licenseData: CreateLicenseRequest): Promise<License> {
-  const res = await apiFetch("/licenses", apiFetchWithBody('POST', licenseData));
-  
+  const res = await apiFetch("/licenses", apiFetchWithBody("POST", licenseData));
+
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ error: 'Failed to create license' }));
-    throw new Error(errorData.error || errorData.message || 'Failed to create license');
+    const errorData = await res.json().catch(() => ({ error: "Failed to create license" }));
+    throw new Error(errorData.error || errorData.message || "Failed to create license");
   }
-  
+
   const data = await res.json();
   return data.license || data;
 }
