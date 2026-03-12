@@ -10,6 +10,7 @@ interface Order {
   email: string;
   product: string;
   amount: number;
+  revenue: number;
   status: string;
   created_at: string;
 }
@@ -52,11 +53,12 @@ export default function OrdersPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-slate-800">
-                <TableHead>Email</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+               <TableHead>Email</TableHead>
+<TableHead>Product</TableHead>
+<TableHead>Amount</TableHead>
+<TableHead>Revenue</TableHead>
+<TableHead>Status</TableHead>
+<TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -70,11 +72,15 @@ export default function OrdersPage() {
 
                   <TableCell>${o.amount}</TableCell>
 
-                  <TableCell>
-                    <Badge className="bg-green-500/10 text-green-400">
-                      {o.status}
-                    </Badge>
-                  </TableCell>
+<TableCell className="text-green-400 font-medium">
+  ${o.revenue}
+</TableCell>
+
+<TableCell>
+  <Badge className="bg-green-500/10 text-green-400">
+    {o.status}
+  </Badge>
+</TableCell>
 
                   <TableCell className="text-slate-400">
                     {new Date(o.created_at).toLocaleDateString()}
