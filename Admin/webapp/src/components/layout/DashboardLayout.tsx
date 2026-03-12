@@ -23,7 +23,8 @@ import {
   TrendingUp,
   PieChart,
   Users,
-  CreditCard
+  CreditCard,
+  Shield
 } from 'lucide-react';
 
 const navigation = [
@@ -36,6 +37,8 @@ const navigation = [
 
   { name: 'API Keys', href: '/dashboard/api-keys', icon: Key },
   { name: 'Analytics', href: '/dashboard/analytics', icon: PieChart },
+
+  { name: 'Security', href: '/dashboard/security', icon: Shield }
 ];
 
 function Sidebar({ className }: { className?: string }) {
