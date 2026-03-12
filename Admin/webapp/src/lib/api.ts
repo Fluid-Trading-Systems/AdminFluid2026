@@ -364,6 +364,25 @@ export async function getOrders() {
   }
 }
 
+// ========== SECURITY ANALYTICS API ==========
+
+// GET /admin/security
+export async function getSecurityLogs() {
+  try {
+    const res = await apiFetch("/admin/security", apiFetchWithBody('GET'));
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    return data.logs || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+
 // DELETE /licenses/:licenseKey
 export async function cancelLicense(licenseKey: string): Promise<void> {
   const res = await apiFetch(`/licenses/${licenseKey}`, apiFetchWithBody('DELETE'));
