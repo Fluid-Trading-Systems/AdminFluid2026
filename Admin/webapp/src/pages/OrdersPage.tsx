@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
 import { getOrders } from "@/lib/api";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 interface Order {
+  license_key: string;
   email: string;
   product: string;
   amount: number;
@@ -32,6 +40,43 @@ export default function OrdersPage() {
     loadOrders();
   }, []);
 
+  const refundOrder = async (licenseKey: string) => {
+
+    const amount = prompt("Enter refund amount");
+
+    if (!amount) return;
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("/admin/refund", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          license_key: licenseKey,
+          amount: Number(amount)
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Refund failed");
+
+      toast.success("Refund processed");
+
+      loadOrders();
+
+    } catch (err: any) {
+
+      toast.error(err.message || "Refund failed");
+
+    }
+  };
+
   return (
     <div className="space-y-6">
 
@@ -51,43 +96,66 @@ export default function OrdersPage() {
         <CardContent>
 
           <Table>
+
             <TableHeader>
               <TableRow className="border-slate-800">
-               <TableHead>Email</TableHead>
-<TableHead>Product</TableHead>
-<TableHead>Amount</TableHead>
-<TableHead>Revenue</TableHead>
-<TableHead>Status</TableHead>
-<TableHead>Date</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Revenue</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
+
               {orders.map((o, i) => (
+
                 <TableRow key={i} className="border-slate-800">
 
-                  <TableCell className="text-white">{o.email}</TableCell>
+                  <TableCell className="text-white">
+                    {o.email}
+                  </TableCell>
 
-                  <TableCell>{o.product}</TableCell>
+                  <TableCell>
+                    {o.product}
+                  </TableCell>
 
-                  <TableCell>${o.amount}</TableCell>
+                  <TableCell>
+                    ${o.amount}
+                  </TableCell>
 
-<TableCell className="text-green-400 font-medium">
-  ${o.revenue}
-</TableCell>
+                  <TableCell className="text-green-400 font-medium">
+                    ${o.revenue}
+                  </TableCell>
 
-<TableCell>
-  <Badge className="bg-green-500/10 text-green-400">
-    {o.status}
-  </Badge>
-</TableCell>
+                  <TableCell>
+                    <Badge className="bg-green-500/10 text-green-400">
+                      {o.status}
+                    </Badge>
+                  </TableCell>
 
                   <TableCell className="text-slate-400">
                     {new Date(o.created_at).toLocaleDateString()}
                   </TableCell>
 
+                  <TableCell>
+
+                    <button
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                      onClick={() => refundOrder(o.license_key)}
+                    >
+                      Refund
+                    </button>
+
+                  </TableCell>
+
                 </TableRow>
+
               ))}
+
             </TableBody>
 
           </Table>
