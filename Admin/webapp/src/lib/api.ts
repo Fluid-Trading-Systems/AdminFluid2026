@@ -184,6 +184,25 @@ export async function deleteProduct(id: string): Promise<void> {
   }
 }
 
+
+// GET /products
+export async function getProducts(): Promise<Product[]> {
+  try {
+    const res = await apiFetch("/products", apiFetchWithBody("GET"));
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    return data.products || [];
+  } catch {
+    return [];
+  }
+}
+
+
+
 // ==========================
 // PRODUCT FILES API
 // ==========================
