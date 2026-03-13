@@ -501,33 +501,60 @@ if (selectedFiles.length > 0 && newProduct?.product?.id) {
   };
 
   const handleDelete = async () => {
-    if (!deletingProduct) return;
+  if (!deletingProduct) return;
 
-    try {
-      await deleteProduct(deletingProduct.id);
-      toast.success('Product deleted successfully');
-      setIsDeleteDialogOpen(false);
-      setDeletingProduct(null);
-      // Refresh data from API
-      await refreshProducts();
-    } catch (error) {
-      toast.error('Failed to delete product');
-    }
-  };
+  try {
+    await deleteProduct(deletingProduct.id);
+    toast.success('Product deleted successfully');
+    setIsDeleteDialogOpen(false);
+    setDeletingProduct(null);
+    await refreshProducts();
+  } catch (error) {
+    toast.error('Failed to delete product');
+  }
+};
 
-  const handleDeleteFile = async (fileId: string) => {
-    if (!viewingProduct) return;
+// ✅ ADD THIS FUNCTION HERE
+const generateTestLicense = async (productId: string) => {
+  try {
 
-    try {
-      await deleteProductFile(viewingProduct.id, fileId);
-      toast.success('File deleted');
-      // Refresh files
-      const files = await getProductFiles(viewingProduct.id);
-      setProductFiles(files);
-    } catch (err) {
-      toast.error('Failed to delete file');
-    }
-  };
+    const res = await fetch(
+      "https://api.fluidtradingsystems.com/admin/test-license",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer owner_session"
+        },
+        body: JSON.stringify({
+          product_id: productId
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    toast.success("Test License: " + data.license_key);
+
+  } catch {
+    toast.error("Failed to generate test license");
+  }
+};
+
+const handleDeleteFile = async (fileId: string) => {
+  if (!viewingProduct) return;
+
+  try {
+    await deleteProductFile(viewingProduct.id, fileId);
+    toast.success('File deleted');
+    const files = await getProductFiles(viewingProduct.id);
+    setProductFiles(files);
+  } catch (err) {
+    toast.error('Failed to delete file');
+  }
+};
 
   const formatPrice = (price: number) => {
     if (typeof price !== 'number' || isNaN(price)) return '-';
@@ -629,8 +656,9 @@ if (selectedFiles.length > 0 && newProduct?.product?.id) {
                   <TableRow className="border-slate-800 hover:bg-transparent">
                     <TableHead className="text-slate-400">Product</TableHead>
                     <TableHead className="text-slate-400">Platform</TableHead>
-                    <TableHead className="text-slate-400">Price</TableHead>
-                    <TableHead className="text-slate-400 text-right">Actions</TableHead>
+                   <TableHead className="text-slate-400">Price</TableHead>
+<TableHead className="text-slate-400">Status</TableHead>
+<TableHead className="text-slate-400 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -663,26 +691,52 @@ if (selectedFiles.length > 0 && newProduct?.product?.id) {
                       <TableCell className="text-white">
                         {formatPrice(product?.price)}
                       </TableCell>
+                      <TableCell>
+  {product?.is_test === 1 ? (
+    <Badge className="bg-purple-600 text-white">
+      TEST
+    </Badge>
+  ) : (
+    <Badge className="bg-green-600 text-white">
+      LIVE
+    </Badge>
+  )}
+</TableCell>
+
+
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => product && handleOpenView(product)}
-                            className="text-slate-400 hover:text-blue-400 hover:bg-blue-950/50"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => product && handleOpenDelete(product)}
-                            className="text-slate-400 hover:text-red-400 hover:bg-red-950/50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+  <div className="flex items-center justify-end gap-2">
+
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => generateTestLicense(product.id)}
+      className="text-slate-400 hover:text-green-400 hover:bg-green-950/50"
+    >
+      TL
+    </Button>
+
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => product && handleOpenView(product)}
+      className="text-slate-400 hover:text-blue-400 hover:bg-blue-950/50"
+    >
+      <Eye className="h-4 w-4" />
+    </Button>
+
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => product && handleOpenDelete(product)}
+      className="text-slate-400 hover:text-red-400 hover:bg-red-950/50"
+    >
+      <Trash2 className="h-4 w-4" />
+    </Button>
+
+  </div>
+</TableCell>
+                        
                     </TableRow>
                   ))}
                 </TableBody>
