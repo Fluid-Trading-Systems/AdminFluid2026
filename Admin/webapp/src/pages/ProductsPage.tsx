@@ -541,16 +541,6 @@ const generateTestLicense = async (productId: string) => {
   }
 };
   
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error);
-
-    toast.success("Test License: " + data.license);
-
-  } catch {
-    toast.error("Failed to generate test license");
-  }
-};
 
 const handleDeleteFile = async (fileId: string) => {
   if (!viewingProduct) return;
@@ -604,7 +594,7 @@ const handleDeleteFile = async (fileId: string) => {
         </div>
        <div className="flex gap-2">
 
-<div className="flex gap-2">
+
 
   <Button
     onClick={() => {
