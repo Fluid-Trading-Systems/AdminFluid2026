@@ -53,6 +53,7 @@ export interface Product {
   image_url: string;
   card_design?: string;
   plan_type?: string;
+  is_test?: number;
   createdAt: string;
   files?: ProductFile[];
 }
@@ -70,6 +71,7 @@ export interface CreateProductRequest {
   plan_type?: string | null;
   priceTier?: string | null;
   modules?: string[];
+  is_test?: number;
 }
 
 // Product Files
