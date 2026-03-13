@@ -500,7 +500,7 @@ if (selectedFiles.length > 0 && newProduct?.product?.id) {
     }
   };
 
-  const handleDelete = async () => {
+const handleDelete = async () => {
   if (!deletingProduct) return;
 
   try {
@@ -531,6 +531,17 @@ const generateTestLicense = async (productId: string) => {
         })
       }
     );
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    toast.success("Test License: " + data.license_key);
+
+  } catch {
+    toast.error("Failed to generate test license");
+  }
+};
 
     const data = await res.json();
 
@@ -593,12 +604,37 @@ const handleDeleteFile = async (fileId: string) => {
           <h2 className="text-2xl font-bold text-white">Products</h2>
           <p className="text-slate-400 mt-1">Manage your trading software products</p>
         </div>
-        <div className="flex gap-2">
+       <div className="flex gap-2">
+
   <Button
     onClick={() => {
       setIsTestProduct(false);
       handleOpenCreate();
     }}
+    className="bg-blue-600 hover:bg-blue-700 text-white"
+  >
+    <Plus className="h-4 w-4 mr-2" />
+    Add Product
+  </Button>
+
+  <Button
+    onClick={() => {
+      setIsTestProduct(true);
+      handleOpenCreate();
+    }}
+    className="bg-purple-600 hover:bg-purple-700 text-white"
+  >
+    Test Product
+  </Button>
+
+  <Button
+    onClick={generateQuickTestLicense}
+    className="bg-green-600 hover:bg-green-700 text-white"
+  >
+    Create Test License
+  </Button>
+
+</div>
     className="bg-blue-600 hover:bg-blue-700 text-white"
   >
     <Plus className="h-4 w-4 mr-2" />
