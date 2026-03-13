@@ -536,7 +536,7 @@ const generateTestLicense = async (productId: string) => {
 
     if (!res.ok) throw new Error(data.error);
 
-    toast.success("Test License: " + data.license_key);
+    toast.success("Test License: " + data.license);
 
   } catch {
     toast.error("Failed to generate test license");
@@ -707,14 +707,16 @@ const handleDeleteFile = async (fileId: string) => {
                       <TableCell className="text-right">
   <div className="flex items-center justify-end gap-2">
 
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => generateTestLicense(product.id)}
-      className="text-slate-400 hover:text-green-400 hover:bg-green-950/50"
-    >
-      TL
-    </Button>
+    {product?.is_test === 1 && (
+  <Button
+    variant="ghost"
+    size="icon"
+    onClick={() => generateTestLicense(product.id)}
+    className="text-slate-400 hover:text-green-400 hover:bg-green-950/50"
+  >
+    TL
+  </Button>
+)}
 
     <Button
       variant="ghost"
