@@ -159,6 +159,7 @@ export function ProductsPage() {
   const [hasError, setHasError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTestProduct, setIsTestProduct] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
@@ -458,8 +459,8 @@ if (selectedVideoFile) {
           price_tier: null,
            rating: formData.rating,   // ⭐ ADD THIS
   faqs: formData.faqs,       // ❓ ADD THIS
-
           enabled: 1
+          is_test: isTestProduct ? 1 : 0,
         })
       });
 
@@ -565,13 +566,28 @@ if (selectedFiles.length > 0 && newProduct?.product?.id) {
           <h2 className="text-2xl font-bold text-white">Products</h2>
           <p className="text-slate-400 mt-1">Manage your trading software products</p>
         </div>
-        <Button 
-          onClick={handleOpenCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Product
-        </Button>
+        <div className="flex gap-2">
+  <Button
+    onClick={() => {
+      setIsTestProduct(false);
+      handleOpenCreate();
+    }}
+    className="bg-blue-600 hover:bg-blue-700 text-white"
+  >
+    <Plus className="h-4 w-4 mr-2" />
+    Add Product
+  </Button>
+
+  <Button
+    onClick={() => {
+      setIsTestProduct(true);
+      handleOpenCreate();
+    }}
+    className="bg-purple-600 hover:bg-purple-700 text-white"
+  >
+    Test Product
+  </Button>
+</div>
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
@@ -620,17 +636,25 @@ if (selectedFiles.length > 0 && newProduct?.product?.id) {
                 <TableBody>
                   {filteredProducts.map((product) => (
                     <TableRow key={product?.id || Math.random()} className="border-slate-800">
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          
-                          <div>
-                            <div className="font-medium text-white">{product?.name || 'Unnamed Product'}</div>
-                            <div className="text-sm text-slate-500 truncate max-w-xs">
-                              {product?.description || ''}
-                            </div>
-                          </div>
-                        </div>
-                      </TableCell>
+                         <TableCell>
+  <div className="flex items-center gap-3">
+    <div>
+      <div className="font-medium text-white flex items-center gap-2">
+        {product?.name || 'Unnamed Product'}
+
+        {product?.is_test === 1 && (
+          <Badge className="bg-purple-600 text-white text-xs">
+            TEST
+          </Badge>
+        )}
+      </div>
+
+      <div className="text-sm text-slate-500 truncate max-w-xs">
+        {product?.description || ''}
+      </div>
+    </div>
+  </div>
+</TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="bg-slate-800 text-slate-300">
                           {product?.platform || '-'}
