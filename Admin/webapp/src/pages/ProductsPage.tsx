@@ -459,7 +459,7 @@ if (selectedVideoFile) {
           price_tier: null,
            rating: formData.rating,   // ⭐ ADD THIS
   faqs: formData.faqs,       // ❓ ADD THIS
-          enabled: 1
+          enabled: 1,
           is_test: isTestProduct ? 1 : 0,
         })
       });
