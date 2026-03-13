@@ -534,6 +534,8 @@ const generateTestLicense = async (productId: string) => {
 
     if (!res.ok) throw new Error(data.error);
 
+     await navigator.clipboard.writeText(data.license_key);
+
     toast.success("Test License: " + data.license_key);
 
   } catch {
