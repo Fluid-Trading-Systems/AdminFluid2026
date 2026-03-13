@@ -514,10 +514,8 @@ const handleDelete = async () => {
   }
 };
 
-// ✅ ADD THIS FUNCTION HERE
 const generateTestLicense = async (productId: string) => {
   try {
-
     const res = await fetch(
       "https://api.fluidtradingsystems.com/admin/test-license",
       {
@@ -542,7 +540,7 @@ const generateTestLicense = async (productId: string) => {
     toast.error("Failed to generate test license");
   }
 };
-
+  
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.error);
@@ -606,6 +604,8 @@ const handleDeleteFile = async (fileId: string) => {
         </div>
        <div className="flex gap-2">
 
+<div className="flex gap-2">
+
   <Button
     onClick={() => {
       setIsTestProduct(false);
@@ -627,30 +627,9 @@ const handleDeleteFile = async (fileId: string) => {
     Test Product
   </Button>
 
-  <Button
-    onClick={generateQuickTestLicense}
-    className="bg-green-600 hover:bg-green-700 text-white"
-  >
-    Create Test License
-  </Button>
-
 </div>
-    className="bg-blue-600 hover:bg-blue-700 text-white"
-  >
-    <Plus className="h-4 w-4 mr-2" />
-    Add Product
-  </Button>
 
-  <Button
-    onClick={() => {
-      setIsTestProduct(true);
-      handleOpenCreate();
-    }}
-    className="bg-purple-600 hover:bg-purple-700 text-white"
-  >
-    Test Product
-  </Button>
-</div>
+         
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
