@@ -267,7 +267,7 @@ export async function uploadProductFiles(productId: string, files: File[]): Prom
   formData.append("product_id", productId);
 
   for (const file of files) {
-    formData.append("file", file);
+    formData.append("files", file);
   }
 
   const res = await fetch(`${API_BASE}/upload/product-files`, {
