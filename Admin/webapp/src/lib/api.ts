@@ -292,11 +292,14 @@ export async function uploadProductFiles(
 
     const data = await res.json();
 
-    uploaded.push({
-      id: data.id || "",
-      file_name: data.file_name,
-      file_url: data.file_url
-    });
+    
+  uploaded.push({
+  id: data.id || "",
+  product_id: productId,
+  file_name: data.file_name,
+  file_url: data.file_url,
+  created_at: data.created_at || new Date().toISOString()
+});
   }
 
   return uploaded;
