@@ -198,22 +198,26 @@ export async function deleteProduct(id: string): Promise<void> {
 }
 
 // ========== PRODUCT FILES API ==========
-
-// GET /products/:id/files
 export async function getProductFiles(productId: string): Promise<ProductFile[]> {
   try {
-    const res = await apiFetch(`/products/${productId}/files`, apiFetchWithBody('GET'));
-    
+
+    const res = await apiFetch(`/products/${productId}/files`, {
+      method: "GET"
+    });
+
     if (!res.ok) {
       return [];
     }
-    
+
     const data = await res.json();
-    return data.files || [];
+
+    return data || [];
+
   } catch (error) {
     return [];
   }
 }
+
 
 // POST /upload/product-image - Upload product card image
 export async function uploadProductImage(file: File): Promise<string> {
@@ -260,41 +264,62 @@ export async function uploadProductGalleryImages(productId: string, files: File[
   return uploadedUrls;
 }
 
-export async function uploadProductFiles(productId: string, files: File[]): Promise<ProductFile[]> {
 
-  const formData = new FormData();
+export async function uploadProductFiles(
+  productId: string,
+  files: File[]
+): Promise<ProductFile[]> {
 
-  formData.append("product_id", productId);
+  const uploaded: ProductFile[] = [];
 
   for (const file of files) {
-    formData.append("files", file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API_BASE}/products/${productId}/files`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer owner_session"
+      },
+      body: formData
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: "File upload failed" }));
+      throw new Error(error.error || "File upload failed");
+    }
+
+    const data = await res.json();
+
+    uploaded.push({
+      id: data.id || "",
+      file_name: data.file_name,
+      file_url: data.file_url
+    });
   }
 
-  const res = await fetch(`${API_BASE}/upload/product-files`, {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer owner_session"
-    },
-    body: formData
-  });
-
-  if (!res.ok) {
-    throw new Error("File upload failed");
-  }
-
-  const data = await res.json();
-  return data.uploaded || [];
+  return uploaded;
 }
+
 
 // DELETE /products/:productId/files/:fileId
-export async function deleteProductFile(productId: string, fileId: string): Promise<void> {
-  const res = await apiFetch(`/products/${productId}/files/${fileId}`, apiFetchWithBody('DELETE'));
-  
+export async function deleteProductFile(
+  productId: string,
+  fileId: string
+): Promise<void> {
+
+  const res = await apiFetch(
+    `/products/${productId}/files/${fileId}`,
+    apiFetchWithBody("DELETE")
+  );
+
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ error: 'Failed to delete file' }));
-    throw new Error(errorData.error || errorData.message || 'Failed to delete file');
+    const errorData = await res.json().catch(() => ({ error: "Failed to delete file" }));
+    throw new Error(errorData.error || errorData.message || "Failed to delete file");
   }
 }
+
 
 // ========== LICENSES API ==========
 
