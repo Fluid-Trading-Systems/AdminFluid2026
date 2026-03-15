@@ -211,7 +211,7 @@ export async function getProductFiles(productId: string): Promise<ProductFile[]>
 
     const data = await res.json();
 
-    return data || [];
+    return data.files || [];
 
   } catch (error) {
     return [];
